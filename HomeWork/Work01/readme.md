@@ -33,9 +33,9 @@
 
 ####  Шаг 2. Проверьте настройки коммутатора по умолчанию.
 ```
+a.
 Switch>
 Switch>enable
-Switch#show run
 Switch#show running-config 
 Building configuration...
 
@@ -48,23 +48,22 @@ no service password-encryption
 !
 hostname Switch
 ```
-
+b.
 - Интерфейсов FastEthernet имеется 24.
 - Интерфейсов Gigabit Ethernet имеется 2.
 - Диапазоны значений, отображаемых в vty-линиях:
-```
-line con 0
-!
-line vty 0 4
- login
-line vty 5 15
- login
-```
+  - line vty 0 4
+  - line vty 5 15
+c.
 При попытке изучить файл загрузочной конфигурации (startup configuration), который содержится в энергонезависимом ОЗУ (NVRAM)
 ```
-Switch#show star
 Switch#show startup-config 
 startup-config is not present
 Switch#
 ```
 Данная надпись (startup-config is not present) появляется, так как у нас не сохранена конфигурация по умолчанию.
+d.
+Switch#show interface vlan 1
+
+Данный интерфейс включен по умолчанию.
+
