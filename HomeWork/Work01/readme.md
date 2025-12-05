@@ -56,14 +56,62 @@ b.
   - line vty 5 15
 c.
 При попытке изучить файл загрузочной конфигурации (startup configuration), который содержится в энергонезависимом ОЗУ (NVRAM)
+
 ```
 Switch#show startup-config 
 startup-config is not present
 Switch#
 ```
+
 Данная надпись (startup-config is not present) появляется, так как у нас не сохранена конфигурация по умолчанию.
 d.
+```
 Switch#show interface vlan 1
+``` 
+IP-адрес сети VLAN 1 не назначен.
+mac-address 0001.c766.715b
+Данный интерфейс административно отключен.
+e.
+```
+Switch#show ip interface vlan 1
+Vlan1 is administratively down, line protocol is down
+  Internet protocol processing disabled
+```
+Vlan 1 - отключен;
+Канал передачи данных - отключен;
+Отключена обработка интернет-протокола.
+f.
+<img width="318" height="140" alt="image" src="https://github.com/user-attachments/assets/dc6e37e8-e01b-43c0-aec4-8e8f76cbad6f" />
+g.
+```
+Switch#show version
+```
+Версия ОС Cisco IOS  -  Version 15.0(2)SE4, RELEASE SOFTWARE (fc1)
 
-Данный интерфейс включен по умолчанию.
+Файл образа системы  -  2960-lanbasek9-mz.150-2.SE4.bin
+h.
+```
+Switch#show interface f
+```
+Интерфейс включен;
+
+Чтобы включить интерфейс:
+```
+Switch#configure terminal 
+Switch(config)#interface f0/6
+Switch(config-if)#
+Switch(config-if)#no shutdown
+```
+mac-address 0002.4a5b.dd06
+
+Настройки скорости и дуплекса -   Full-duplex, 100Mb/s
+
+i.
+```
+Switch#show flash
+```
+Файл образа системы  - 2960-lanbasek9-mz.150-2.SE4.bin
+
+###  Часть 2. Настройка базовых параметров сетевых устройств
+
 
