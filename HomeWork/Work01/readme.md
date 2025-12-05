@@ -128,12 +128,31 @@ Unauthorized access is strictly prohibited. #
 
 S1(config)#
 ```
-b.
+b. Назначение IP-адреса интерфейсу SVI на коммутаторе
 ```
 S1(config)#interface vlan 1
 S1(config-if)#ip address 192.168.1.2 255.255.255.0
-S1(config-if)#exit
+```
+c. Доступ через порт консоли 
+```
+S1(config)#line con 0
+S1(config-line)#logging synchronous
+S1(config-line)#password cisco
+S1(config-line)#login
+```
+d.	Настройка каналов виртуального соединения для удаленного управления (vty)
+```
+S1(config)#line vty 0 4
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#line vty 5 15
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
 S1(config)#
 ```
-c.
-c.	Доступ через порт консоли 
+Команда login включает проверку пароля при входе в систему.
+
+####  Шаг 2. Настройте IP-адрес на компьютере PC-A.
+
