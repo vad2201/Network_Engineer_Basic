@@ -99,7 +99,6 @@ Switch#show interface f
 ```
 Switch#configure terminal 
 Switch(config)#interface f0/6
-Switch(config-if)#
 Switch(config-if)#no shutdown
 ```
 mac-address 0002.4a5b.dd06
@@ -114,4 +113,27 @@ Switch#show flash
 
 ###  Часть 2. Настройка базовых параметров сетевых устройств
 
+####  Шаг 1. Настройка базовых параметров коммутатора.
+a.
+```
+Switch#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#no ip domain-lookup
+Switch(config)#hostname S1
+S1(config)#service password-encryption
+S1(config)#enable secret class
+S1(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Unauthorized access is strictly prohibited. #
 
+S1(config)#
+```
+b.
+```
+S1(config)#interface vlan 1
+S1(config-if)#ip address 192.168.1.2 255.255.255.0
+S1(config-if)#exit
+S1(config)#
+```
+c.
+c.	Доступ через порт консоли 
