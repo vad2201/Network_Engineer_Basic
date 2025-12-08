@@ -291,7 +291,9 @@ Approximate round trip times in milli-seconds:
     Minimum = 0ms, Maximum = 10ms, Average = 6ms
 ```
 Связь есть.
+
 b.
+
 Сначала включаем Vlan 1, так как он по умолчанию отключен
 ```
 S1>enable
@@ -320,4 +322,15 @@ Approximate round trip times in milli-seconds:
 ```
 Связь есть.
 ####  Шаг 3. Проверьте удаленное управление коммутатором S1.
+
+<img width="828" height="651" alt="image" src="https://github.com/user-attachments/assets/4ccb5daa-9e69-4cdd-9d89-26a2c1f8f65c" />
+
+###	Вопросы для повторения
+1.	Зачем необходимо настраивать пароль VTY для коммутатора?
+
+  	Если не настроить пароль VTY, будет невозможно подключиться к коммутатору по протоколу Telnet.
+3.	Что нужно сделать, чтобы пароли не отправлялись в незашифрованном виде?
+```
+S1(config)#service password-encryption
+```
 
