@@ -273,3 +273,51 @@ S1#show interface vlan 1
 Полоса пропускания (BW)   -  100000 Kbit
 
 ####  Шаг 2. Протестируйте сквозное соединение, отправив эхо-запрос.
+a.
+```
+Cisco Packet Tracer PC Command Line 1.0
+C:\>ping 192.168.1.10
+
+Pinging 192.168.1.10 with 32 bytes of data:
+
+Reply from 192.168.1.10: bytes=32 time=9ms TTL=128
+Reply from 192.168.1.10: bytes=32 time=8ms TTL=128
+Reply from 192.168.1.10: bytes=32 time=10ms TTL=128
+Reply from 192.168.1.10: bytes=32 time<1ms TTL=128
+
+Ping statistics for 192.168.1.10:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 10ms, Average = 6ms
+```
+Связь есть.
+b.
+Сначала включаем Vlan 1, так как он по умолчанию отключен
+```
+S1>enable
+Password: 
+S1#configure terminal 
+S1(config)#interface vlan 1
+S1(config-if)#no shutdown 
+S1(config-if)#
+S1(config-if)#exit
+```
+Проверяем с командной строки компьютера связь с коммутатором
+```
+C:\>ping 192.168.1.2
+
+Pinging 192.168.1.2 with 32 bytes of data:
+
+Request timed out.
+Reply from 192.168.1.2: bytes=32 time<1ms TTL=255
+Reply from 192.168.1.2: bytes=32 time<1ms TTL=255
+Reply from 192.168.1.2: bytes=32 time<1ms TTL=255
+
+Ping statistics for 192.168.1.2:
+    Packets: Sent = 4, Received = 3, Lost = 1 (25% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+```
+Связь есть.
+####  Шаг 3. Проверьте удаленное управление коммутатором S1.
+
