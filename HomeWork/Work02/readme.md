@@ -26,3 +26,14 @@
 Настройки производим в конфигурации компьютеров.
 <img width="629" height="551" alt="image" src="https://github.com/user-attachments/assets/1e0496ba-ad82-49af-83e9-b9b4388821c5" />
 
+####  Шаг 3. Выполните инициализацию и перезагрузку коммутаторов.
+Для инициализации коммутатора заходим в привилегированный режим и сбрасываем его настройки. После этого перезагружаем коммутатор.
+```
+Switch>enable
+Switch#erase startup-config
+Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]y[OK]
+Erase of nvram: complete
+%SYS-7-NV_BLOCK_INIT: Initialized the geometry of nvram
+Switch#reload
+```
+Это процедуру повторяем и для второго коммутатора
