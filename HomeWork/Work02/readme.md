@@ -36,4 +36,67 @@ Erase of nvram: complete
 %SYS-7-NV_BLOCK_INIT: Initialized the geometry of nvram
 Switch#reload
 ```
-Это процедуру повторяем и для второго коммутатора
+Эту процедуру повторяем и для второго коммутатора.
+
+####  Шаг 4. Настройте базовые параметры каждого коммутатора.
+#####  a.	Настройте имена устройств в соответствии с топологией.
+```
+Первый коммутатор
+Switch>enable
+Switch#configure terminal
+Switch(config)#hostname S1
+S1(config)#
+Второй коммутатор
+Switch>enable
+Switch#configure terminal
+Switch(config)#hostname S2
+S2(config)#
+```
+#####  b.	Настройте IP-адреса, как указано в таблице адресации.
+```
+Первый коммутатор
+S1(config)#interface vlan 1
+S1(config-if)#ip address 192.168.1.11 255.255.255.0
+S1(config-if)#no shutdown
+Второй коммутатор
+S2(config)#interface vlan 1
+S2(config-if)#ip address 192.168.1.12 255.255.255.0
+S2(config-if)#no shutdown
+```
+#####  c.	Назначьте cisco в качестве паролей консоли и VTY.
+```
+Назначаем пароль консоли для обоих коммутаторов
+S1(config)#line con 0
+S1(config-line)#password cisco
+S1(config-line)#login
+S2(config)#line con 0
+S2(config-line)#password cisco
+S2(config-line)#login
+Назначаем пароли VTY для доступа к коммутаторам по протоколу Telnet.
+S1(config)#line vty 0 4
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#line vty 5 15
+S1(config-line)#password cisco
+S1(config-line)#login
+Для второго коммутатора повторяем процедуру
+S2(config)#line vty 0 4
+S2(config-line)#password cisco
+S2(config-line)#login
+S2(config-line)#exit
+S2(config)#line vty 5 15
+S2(config-line)#password cisco
+S2(config-line)#login
+```
+#####  d.	Назначьте class в качестве пароля доступа к привилегированному режиму EXEC.
+```
+Первый коммутатор
+S1>enable
+S1#configure terminal
+S1(config)#enable secret class
+Второй коммутатор
+S2>enable
+S2#configure terminal
+S2(config)#enable secret class
+```
