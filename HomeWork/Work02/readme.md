@@ -100,3 +100,49 @@ S2>enable
 S2#configure terminal
 S2(config)#enable secret class
 ```
+###  Часть 2. Изучение таблицы МАС-адресов коммутатора
+#####  Шаг 1. Запишите МАС-адреса сетевых устройств.
+a.
+На обоих компьютерах в командной строке выводим команду:
+```
+ipconfig /all
+```
+Первый компьютер. MAC-адрес (IPv4, IPv6)
+
+<img width="621" height="138" alt="image" src="https://github.com/user-attachments/assets/eb513ca6-f20f-4a8e-acbb-67ce7174a1bf" />
+
+
+Второй компьютер. MAC-адрес (IPv4, IPv6)
+
+<img width="617" height="145" alt="image" src="https://github.com/user-attachments/assets/d3c93513-9014-4f0a-8186-549156aba924" />
+
+b.	Подключаемся к коммутаторам S1 и S2 через консоль и вводим команду 
+Первый комутатор
+```
+User Access Verification
+Password: 
+S1>enable
+Password: 
+S1#show interface F0/1
+FastEthernet0/1 is up, line protocol is up (connected)
+  Hardware is Lance, address is 0001.9738.4601 (bia 0001.9738.4601)
+```
+MAC-адрес:   0001.9738.4601
+
+Второй коммутатор
+```
+User Access Verification
+Password: 
+S2>enable
+Password: 
+S2#show interface F0/1
+FastEthernet0/1 is up, line protocol is up (connected)
+  Hardware is Lance, address is 000a.4118.7201 (bia 000a.4118.7201)
+```
+MAC-адрес:   000a.4118.7201
+
+#####  Шаг 2. Просмотрите таблицу МАС-адресов коммутатора.
+
+
+#####  
+#####  
