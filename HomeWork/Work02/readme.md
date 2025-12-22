@@ -177,5 +177,79 @@ b.	Снова смотрим таблицу MAC-адресов.
 После повторного просмотра таблицы изменений не появилось.
 
 #####  Шаг 4. С компьютера PC-B отправьте эхо-запросы устройствам в сети и просмотрите таблицу МАС-адресов коммутатора.
+a. Выполнив команду arp -a, понимаем, что через протокол arp не добавлено никаких MAC-адресов
+```
+C:\>arp -a
+No ARP Entries Found
+```
+b. Пингуем все устройства в сети
+```   
+    C:\>ping 192.168.1.1
+    
+    Pinging 192.168.1.1 with 32 bytes of data:
+    
+    Reply from 192.168.1.1: bytes=32 time<1ms TTL=128
+    Reply from 192.168.1.1: bytes=32 time<1ms TTL=128
+    Reply from 192.168.1.1: bytes=32 time<1ms TTL=128
+    Reply from 192.168.1.1: bytes=32 time=1ms TTL=128
+    
+    Ping statistics for 192.168.1.1:
+        Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+    Approximate round trip times in milli-seconds:
+        Minimum = 0ms, Maximum = 1ms, Average = 0ms
+    
+    C:\>ping 192.168.1.11
+    
+    Pinging 192.168.1.11 with 32 bytes of data:
+    
+    Request timed out.
+    Reply from 192.168.1.11: bytes=32 time=10ms TTL=255
+    Reply from 192.168.1.11: bytes=32 time=1ms TTL=255
+    Reply from 192.168.1.11: bytes=32 time<1ms TTL=255
+    
+    Ping statistics for 192.168.1.11:
+        Packets: Sent = 4, Received = 3, Lost = 1 (25% loss),
+    Approximate round trip times in milli-seconds:
+        Minimum = 0ms, Maximum = 10ms, Average = 3ms
+    
+    C:\>ping 192.168.1.12
+    
+    Pinging 192.168.1.12 with 32 bytes of data:
+    
+    Request timed out.
+    Reply from 192.168.1.12: bytes=32 time<1ms TTL=255
+    Reply from 192.168.1.12: bytes=32 time<1ms TTL=255
+    Reply from 192.168.1.12: bytes=32 time<1ms TTL=255
+    
+    Ping statistics for 192.168.1.12:
+        Packets: Sent = 4, Received = 3, Lost = 1 (25% loss),
+    Approximate round trip times in milli-seconds:
+        Minimum = 0ms, Maximum = 0ms, Average = 0ms
+```
+Понимаем, что все устройства доступны в сети.
 
-#####  
+c. Подключаемся к коммутатору S2 и смотрим его таблицу MAC-адресов  до проверки связи в сети:
+
+<img width="441" height="220" alt="image" src="https://github.com/user-attachments/assets/e656b7a2-8108-4aaa-a16d-44d2403e6acb" />
+
+и после проведения проверки соединения компьютера PC-B с устройствами в сети:
+
+<img width="454" height="242" alt="image" src="https://github.com/user-attachments/assets/0c7dc355-9772-4417-b13e-c42983c6c941" />
+
+Делаем вывод, что в таблицу MAC-адресов коммутатора добавились записи MAC-адресов, находящихся в сети устройств.
+Открываем консоль компьютера PC-B и смотрим кэш MAC-адресов заново
+```
+C:\>arp -a
+```
+<img width="577" height="135" alt="image" src="https://github.com/user-attachments/assets/5edb8610-bdf7-4c37-ae7c-8e94db973a7e" />
+
+Таблица MAC-адресов пополнилась.
+
+Вопрос для повторения
+В сетях Ethernet данные передаются на устройства по соответствующим МАС-адресам. Для этого коммутаторы и компьютеры динамически создают ARP-кэш и таблицы МАС-адресов. Если компьютеров в сети немного, эта процедура выглядит достаточно простой. Какие сложности могут возникнуть в крупных сетях?
+
+Если в сети много устройств, таблица МАС-адресов может быть переполнена, что может привести к ошибкам при поиске MAC-адреса назначения. 
+
+Устаревшие записи. Если узлы долго не передают данные, соответствующие записи из таблицы удаляются. 
+
+Сложность широковещания запроса ARP. Рассылки ARP могут вызывать широковещательные штормы. 
