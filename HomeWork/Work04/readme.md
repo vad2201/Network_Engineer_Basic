@@ -21,35 +21,46 @@
 ### Примечание:
 Так как в Cisco Packet Tracer нет маршрутизатора Cisco 4221, будем использовать ISR 4321.
 ### Часть 1. Настройка топологии и конфигурация основных параметров маршрутизатора и коммутатора
+
 ### Сценарий начальной настройки устройств Cisco
 a.	Привилегированный режим.
+
 b.	Имя устройства.
+
 c.	Отключите поиск DNS, чтобы предотвратить попытки неверного преобразования введённых команд так, как если бы они были узлами.
+
 d.	Назначьте class в качестве пароля привилегированного режима.
+
 e.	Назначьте cisco в качестве пароля консоли и включите вход по паролю.
+
 f.	Назначьте cisco в качестве пароля виртуального терминала и включите вход по паролю.
+
 g.	Зашифруйте пароли, хранящиеся в открытом виде.
+
 h.	Создайте баннер с предупреждением о запрете несанкционированного доступа к устройству.
+
 i.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
 
 #### Шаг 1. Настройте маршрутизатор.
-#### a.	Привилегированный режим.
+Сбрасываем настройки на значения по умолчанию и перегружаем
+```
 Router>enable
 Router#
-#### b.	Имя устройства.
+Router#erase startup-config
+Router#reload
+```
+Настраеваем роутер
+```
+Router>enable
+Router#
 Router#configure terminal
-Enter configuration commands, one per line.  End with CNTL/Z.
 Router(config)#hostname R1
-#### c.	Отключите поиск DNS, чтобы предотвратить попытки маршрутизатора неверного преобразования введённых команд так, как если бы они были узлами.
 R1(config)#no ip domain-lookup
-#### d.	Назначьте class в качестве пароля привилегированного режима.
 R1(config)#enable secret class
-#### e.	Назначьте cisco в качестве пароля консоли и включите вход по паролю.
 R1(config)#line con 0
 R1(config-line)#password cisco
 R1(config-line)#login
 R1(config-line)#exit
-#### f.	Назначьте cisco в качестве пароля виртуального терминала и включите вход по паролю.
 R1(config)#line vty 0 4
 R1(config-line)#password cisco
 R1(config-line)#login
@@ -57,14 +68,52 @@ R1(config-line)#exit
 R1(config)#line vty 5 15
 R1(config-line)#password cisco
 R1(config-line)#login
-#### g.	Зашифруйте пароли, хранящиеся в открытом виде.
 R1(config-line)#exit
 R1(config)#service password-encryption
-#### h.	Создайте баннер с предупреждением о запрете несанкционированного доступа к устройству.
 R1(config)#banner motd #
 Enter TEXT message.  End with the character '#'.
 Prohibiting unauthorized access to the device!!!! #
 R1(config)#
-#### i.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
-
+R1(config)#exit
+R1#copy running-config st
+R1#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+R1#
+```
 #### Шаг 2. Настройте коммутатор.
+```
+Switch>enable
+Switch#
+Switch#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostn
+Switch(config)#hostname S1
+S1(config)#no ip domain-lookup
+S1(config)#enable secret class
+S1(config)#line con 0
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#line vty 0 4
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#line vty 5 15
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#service passw
+S1(config)#service password-encryption 
+S1(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+S1(config)#exit
+S1#
+S1#copy running-config startup-config
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+S1#
+```
