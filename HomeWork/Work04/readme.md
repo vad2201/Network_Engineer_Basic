@@ -208,7 +208,7 @@ R1#
 Вопрос:
 Какие группы многоадресной рассылки назначены интерфейсу G0/0?
  FF02::1
-    FF02::1:FF00:1
+ FF02::1:FF00:1
 #### Шаг 2. Активируйте IPv6-маршрутизацию на R1.
 a.	В командной строке на PC-B введите команду ipconfig, чтобы получить данные IPv6-адреса, назначенного интерфейсу ПК.
 <img width="619" height="261" alt="image" src="https://github.com/user-attachments/assets/84aed17a-1c99-41d1-a2f6-6feef96283d9" />
@@ -274,4 +274,202 @@ Vlan1 is up, line protocol is up
   ND reachable time is 30000 milliseconds
 ```
 Убеждаемся что адреса назначены правильно.
+
+#### Шаг 4. Назначьте компьютерам статические IPv6-адреса.
+Компьютер PC-A
+
+Ставим получение настроек автоматически:
+
+<img width="1144" height="128" alt="image" src="https://github.com/user-attachments/assets/12006319-d079-4028-a72e-d2c9b211be6a" />
+
+```
+C:\>ipconfig /all
+
+FastEthernet0 Connection:(default port)
+
+   Connection-specific DNS Suffix..: 
+   Physical Address................: 000D.BD94.AB88
+   Link-local IPv6 Address.........: FE80::20D:BDFF:FE94:AB88
+   IPv6 Address....................: 2001:DB8:ACAD:1:20D:BDFF:FE94:AB88
+   IPv4 Address....................: 0.0.0.0
+   Subnet Mask.....................: 0.0.0.0
+   Default Gateway.................: FE80::1
+                                     0.0.0.0
+   DHCP Servers....................: 0.0.0.0
+   DHCPv6 IAID.....................: 
+   DHCPv6 Client DUID..............: 00-01-00-01-D3-57-4D-7B-00-0D-BD-94-AB-88
+   DNS Servers.....................: ::
+                                     0.0.0.0
+```
+
+Проверяем статические настройки:
+<img width="1125" height="108" alt="image" src="https://github.com/user-attachments/assets/5345a7d6-afdd-47dd-8069-cf7559702df2" />
+
+```
+C:\>ipconfig /all
+
+FastEthernet0 Connection:(default port)
+
+   Connection-specific DNS Suffix..: 
+   Physical Address................: 000D.BD94.AB88
+   Link-local IPv6 Address.........: FE80::20D:BDFF:FE94:AB88
+   IPv6 Address....................: 2001:DB8:ACAD:1::3
+   IPv4 Address....................: 0.0.0.0
+   Subnet Mask.....................: 0.0.0.0
+   Default Gateway.................: FE80::1
+                                     0.0.0.0
+   DHCP Servers....................: 0.0.0.0
+   DHCPv6 IAID.....................: 
+   DHCPv6 Client DUID..............: 00-01-00-01-D3-57-4D-7B-00-0D-BD-94-AB-88
+   DNS Servers.....................: ::
+                                     0.0.0.0
+```
+
+Компьютер PC-B
+
+Ставим получение настроек автоматически:
+
+<img width="1136" height="110" alt="image" src="https://github.com/user-attachments/assets/de81a8ea-cd8d-4865-b40e-fd0d33d982a1" />
+
+```
+C:\>ipconfig /all
+
+FastEthernet0 Connection:(default port)
+
+   Connection-specific DNS Suffix..: 
+   Physical Address................: 0060.3ECC.9519
+   Link-local IPv6 Address.........: FE80::260:3EFF:FECC:9519
+   IPv6 Address....................: 2001:DB8:ACAD:A:260:3EFF:FECC:9519
+   IPv4 Address....................: 0.0.0.0
+   Subnet Mask.....................: 0.0.0.0
+   Default Gateway.................: FE80::1
+                                     0.0.0.0
+   DHCP Servers....................: 0.0.0.0
+   DHCPv6 IAID.....................: 
+   DHCPv6 Client DUID..............: 00-01-00-01-BB-4B-87-1E-00-60-3E-CC-95-19
+   DNS Servers.....................: ::
+                                     0.0.0.0
+```
+
+<img width="1118" height="122" alt="image" src="https://github.com/user-attachments/assets/c57851f8-1020-4bc3-bd91-6294d976c716" />
+
+Проверяем статические настройки:
+```
+C:\>ipconfig /all
+
+FastEthernet0 Connection:(default port)
+
+   Connection-specific DNS Suffix..: 
+   Physical Address................: 0060.3ECC.9519
+   Link-local IPv6 Address.........: FE80::260:3EFF:FECC:9519
+   IPv6 Address....................: 2001:DB8:ACAD:A::3
+   IPv4 Address....................: 0.0.0.0
+   Subnet Mask.....................: 0.0.0.0
+   Default Gateway.................: FE80::1
+                                     0.0.0.0
+   DHCP Servers....................: 0.0.0.0
+   DHCPv6 IAID.....................: 
+   DHCPv6 Client DUID..............: 00-01-00-01-BB-4B-87-1E-00-60-3E-CC-95-19
+   DNS Servers.....................: ::
+                                     0.0.0.0
+```
+
+### Часть 3. Проверка сквозного подключения
+
+С PC-A отправьте эхо-запрос на FE80::1. Это локальный адрес канала, назначенный G0/1 на R1.
+```
+C:\>ping FE80::1
+
+Pinging FE80::1 with 32 bytes of data:
+
+Reply from FE80::1: bytes=32 time<1ms TTL=255
+Reply from FE80::1: bytes=32 time=1ms TTL=255
+Reply from FE80::1: bytes=32 time<1ms TTL=255
+Reply from FE80::1: bytes=32 time=1ms TTL=255
+
+Ping statistics for FE80::1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 1ms, Average = 0ms
+```
+Связь есть.
+
+Отправьте эхо-запрос на интерфейс управления S1 с PC-A.
+```
+C:\>ping 2001:db8:acad:1::b
+
+Pinging 2001:db8:acad:1::b with 32 bytes of data:
+
+Reply from 2001:DB8:ACAD:1::B: bytes=32 time<1ms TTL=255
+Reply from 2001:DB8:ACAD:1::B: bytes=32 time<1ms TTL=255
+Reply from 2001:DB8:ACAD:1::B: bytes=32 time<1ms TTL=255
+Reply from 2001:DB8:ACAD:1::B: bytes=32 time<1ms TTL=255
+
+Ping statistics for 2001:DB8:ACAD:1::B:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+ ```
+Связь есть.
+  
+Введите команду tracert на PC-A, чтобы проверить наличие сквозного подключения к PC-B.
+ ```
+C:\>tracert 2001:db8:acad:a::3
+
+Tracing route to 2001:db8:acad:a::3 over a maximum of 30 hops: 
+
+  1   0 ms      1 ms      1 ms      2001:DB8:ACAD:1::1
+  2   1 ms      0 ms      1 ms      2001:DB8:ACAD:A::3
+
+Trace complete.
+ ```
+Маршрут к компьютеру PC-B проложен.
+
+С PC-B отправьте эхо-запрос на PC-A.
+```
+C:\>ping 2001:db8:acad:1::3
+
+Pinging 2001:db8:acad:1::3 with 32 bytes of data:
+
+Reply from 2001:DB8:ACAD:1::3: bytes=32 time<1ms TTL=127
+Reply from 2001:DB8:ACAD:1::3: bytes=32 time<1ms TTL=127
+Reply from 2001:DB8:ACAD:1::3: bytes=32 time<1ms TTL=127
+Reply from 2001:DB8:ACAD:1::3: bytes=32 time=1ms TTL=127
+
+Ping statistics for 2001:DB8:ACAD:1::3:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 1ms, Average = 0ms
+```
+С компьютера PC-B тоже есть связь с PC-A.
+
+С PC-B отправьте эхо-запрос на локальный адрес канала G0/0 на R1.
+```
+C:\>ping 2001:db8:acad:a::1
+
+Pinging 2001:db8:acad:a::1 with 32 bytes of data:
+
+Reply from 2001:DB8:ACAD:A::1: bytes=32 time<1ms TTL=255
+Reply from 2001:DB8:ACAD:A::1: bytes=32 time<1ms TTL=255
+Reply from 2001:DB8:ACAD:A::1: bytes=32 time<1ms TTL=255
+Reply from 2001:DB8:ACAD:A::1: bytes=32 time<1ms TTL=255
+
+Ping statistics for 2001:DB8:ACAD:A::1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+```
+Доступ с компьютера PC-B на локальный интерфейс R1 открыт.
+
+Вопросы для повторения
+1.	Почему обоим интерфейсам Ethernet на R1 можно назначить один и тот же локальный адрес канала — FE80::1?
+Адрес FE80::1 может быть назначен обоим интерфейсам Ethernet на R1, поскольку адреса link-local ограничены локальной связью в пределах одного сегмента сети и не маршрутизируются.
+2.	Какой идентификатор подсети в индивидуальном IPv6-адресе 2001:db8:acad::aaaa:1234/64?
+2001:db8:acad:0000:0000:0000:aaaa:1234	
+Структура адреса: 
+Первые 48 бит — префикс.
+Следующие 16 бит — идентификатор подсети.
+Последние 64 бита — идентификатор интерфейса.
+Идентификатор подсети:   0000 
+
 
