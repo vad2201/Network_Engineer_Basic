@@ -213,6 +213,7 @@ R1#
 a.	В командной строке на PC-B введите команду ipconfig, чтобы получить данные IPv6-адреса, назначенного интерфейсу ПК.
 <img width="619" height="261" alt="image" src="https://github.com/user-attachments/assets/84aed17a-1c99-41d1-a2f6-6feef96283d9" />
 Индивидуальный IPv6-адрес сетевой интерфейсной карте (NIC) на PC-B не назначен
+
 b.	Активируйте IPv6-маршрутизацию на R1 с помощью команды IPv6 unicast-routing.
 , чтобы убедиться, что новая многоадресная группа назначена интерфейсу G0/0/0. Обратите внимание, что в списке групп для интерфейса G0/0 отображается группа многоадресной рассылки всех маршрутизаторов (FF02::2).
 Joined group address(es):
@@ -220,10 +221,57 @@ Joined group address(es):
     FF02::2
     FF02::1:FF00:1
 Примечание. Это позволит компьютерам получать IP-адреса и данные шлюза по умолчанию с помощью функции SLAAC (Stateless Address Autoconfiguration (Автоконфигурация без сохранения состояния адреса)).
+
 c.	Теперь, когда R1 входит в группу многоадресной рассылки всех маршрутизаторов, еще раз введите команду ipconfig на PC-B. Проверьте данные IPv6-адреса.
+
 <img width="613" height="251" alt="image" src="https://github.com/user-attachments/assets/e801a85c-cc57-470a-860f-2ee683521751" />
+
 Назначен ipv6 адрес и шлюз по умолчанию.
 
 Вопрос:
 Почему PC-B получил глобальный префикс маршрутизации и идентификатор подсети, которые вы настроили на R1?
+
+Потому что после включения режима unicast-routing, R1 действует как маршрутизатор для сети, ответственный за назначение адресов IPv6 к подключенным к нему устройствам.
+
+#### Шаг 3. Назначьте IPv6-адреса интерфейсу управления (SVI) на S1.
+a.	Назначьте адрес IPv6 для S1. Также назначьте этому интерфейсу локальный адрес канала fe80::b.
+```
+S1#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+S1(config)#interface VLAN 1
+S1(config-if)#ipv6 address 2001:db8:acad:1::b/64
+```
+Ошибка говорит нам что шаблон по умолчанию менеджера базы данных 2960 Switch Database Manager (SDM) не поддерживает IPv6. Для включения ipv6 адресации Перед назначением IPv6-адреса SVI VLAN 1 может понадобиться выполнение команды sdm prefer dual-ipv4-and-ipv6 default.
+```
+S1# configure terminal
+S1(config)# sdm prefer dual-ipv4-and-ipv6 default
+S1(config)# end
+S1# reload
+...........
+S1#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+S1(config)#interface VLAN 1
+S1(config-if)#ipv6 address 2001:db8:acad:1::b/64
+S1(config-if)#ipv6 address fe80::b link-local 
+```
+b.	Проверьте правильность назначения IPv6-адресов интерфейсу управления с помощью команды show ipv6 interface vlan1.
+```
+S1#show ipv6 interface vlan 1
+Vlan1 is up, line protocol is up
+  IPv6 is enabled, link-local address is FE80::B
+  No Virtual link-local address(es):
+  Global unicast address(es):
+    2001:DB8:ACAD:1::B, subnet is 2001:DB8:ACAD:1::/64
+  Joined group address(es):
+    FF02::1
+    FF02::1:FF00:B
+  MTU is 1500 bytes
+  ICMP error messages limited to one every 100 milliseconds
+  ICMP redirects are enabled
+  ICMP unreachables are sent
+  Output features: Check hwidb
+  ND DAD is enabled, number of DAD attempts: 1
+  ND reachable time is 30000 milliseconds
+```
+Убеждаемся что адреса назначены правильно.
 
