@@ -111,3 +111,33 @@ Building configuration...
 [OK]
 R1#
 ```
+#### Шаг 4. Настройте компьютер PC-A.
+a.	Настройте для PC-A IP-адрес и маску подсети.
+
+<img width="523" height="189" alt="image" src="https://github.com/user-attachments/assets/e4e3c57a-2e14-4064-967a-e72a2140ba6c" />
+
+b.	Настройте для PC-A шлюз по умолчанию.
+
+<img width="477" height="189" alt="image" src="https://github.com/user-attachments/assets/e5f981ac-2c4f-449b-bb1d-1ec43d585eb4" />
+
+#### Шаг 5. Проверьте подключение к сети.
+Пошлите с PC-A команду Ping на маршрутизатор R1. Если эхо-запрос с помощью команды ping не проходит, найдите и устраните неполадки подключения.
+```
+Cisco Packet Tracer PC Command Line 1.0
+C:\>ping 192.168.1.1
+
+Pinging 192.168.1.1 with 32 bytes of data:
+
+Reply from 192.168.1.1: bytes=32 time<1ms TTL=255
+Reply from 192.168.1.1: bytes=32 time=1ms TTL=255
+Reply from 192.168.1.1: bytes=32 time=1ms TTL=255
+Reply from 192.168.1.1: bytes=32 time<1ms TTL=255
+
+Ping statistics for 192.168.1.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 1ms, Average = 0ms
+
+C:\>
+```
+Связь с маршрутизатором установлена.
