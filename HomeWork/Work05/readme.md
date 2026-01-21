@@ -33,7 +33,6 @@
 Сбрасываем настройки маршрутизатора на значения по умолчанию и перегружаем
 ```
 Router>enable
-Router#erase st
 Router#erase startup-config 
 Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]
 [OK]
@@ -141,3 +140,63 @@ Approximate round trip times in milli-seconds:
 C:\>
 ```
 Связь с маршрутизатором установлена.
+
+### Часть 2. Настройка маршрутизатора для доступа по протоколу SSH
+Подключение к сетевым устройствам по протоколу Telnet сопряжено с риском для безопасности, поскольку вся информация передается в виде открытого текста. Протокол SSH шифрует данные сеанса и обеспечивает аутентификацию устройств, поэтому для удаленных подключений рекомендуется использовать именно этот протокол. В части 2 вам нужно настроить маршрутизатор для приема соединений SSH по линиям VTY.
+#### Шаг 1. Настройте аутентификацию устройств.
+При генерации ключа шифрования в качестве его части используются имя устройства и домен. Поэтому эти имена необходимо указать перед вводом команды crypto key.
+Откройте окно конфигурации
+a.	Задайте имя устройства.
+Имя устройства мы задали при начальной настройке маршрутизатора (Часть 1, Шаг 3. Настройте маршрутизатор.)
+```
+Router>enable
+Router#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#hostname R1
+```
+b.	Задайте домен для устройства.
+```
+R1>enable
+Password: 
+R1#config t
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#ip domain-name confil.ru
+R1(config)#
+```
+#### Шаг 2. Создайте ключ шифрования с указанием его длины.
+```
+R1>enable
+Password: 
+R1#config t
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#ip domain-name confil.ru
+R1(config)#
+R1(config)#crypto key generate rsa
+The name for the keys will be: R1.confil.ru
+Choose the size of the key modulus in the range of 360 to 2048 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 2048
+% Generating 2048 bit RSA keys, keys will be non-exportable...[OK]
+Переключаем ssh на версию 2, так как она является самой безопасной.
+R1(config)#ip ssh version 2
+*Mar 1 2:9:5.758: %SSH-5-ENABLED: SSH 1.99 has been enabled
+R1(config)#do show ip ssh 
+SSH Enabled - version 2.0
+Authentication timeout: 120 secs; Authentication retries: 3
+R1(config)#
+```
+Длина ключа шифрования -  2048 бит.
+
+#### Шаг 3. Создайте имя пользователя в локальной базе учетных записей.
+Настройте имя пользователя, используя admin в качестве имени пользователя и Adm1nP @55 в качестве пароля.
+
+Шаг 4. Активируйте протокол SSH на линиях VTY.
+a.	Активируйте протоколы Telnet и SSH на входящих линиях VTY с помощью команды transport input.
+b.	Измените способ входа в систему таким образом, чтобы использовалась проверка пользователей по локальной базе учетных записей.
+Шаг 5. Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+Шаг 6. Установите соединение с маршрутизатором по протоколу SSH.
+a.	Запустите Tera Term с PC-A.
+b.	Установите SSH-подключение к R1. Use the username admin and password Adm1nP@55. У вас должно получиться установить SSH-подключение к R1.
+
