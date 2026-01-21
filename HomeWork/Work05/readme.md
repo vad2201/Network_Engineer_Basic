@@ -191,12 +191,49 @@ R1(config)#
 
 #### Шаг 3. Создайте имя пользователя в локальной базе учетных записей.
 Настройте имя пользователя, используя admin в качестве имени пользователя и Adm1nP @55 в качестве пароля.
-
-Шаг 4. Активируйте протокол SSH на линиях VTY.
+```
+R1(config)#username admin privilege 15 secret Adm1nP@55
+```
+#### Шаг 4. Активируйте протокол SSH на линиях VTY.
 a.	Активируйте протоколы Telnet и SSH на входящих линиях VTY с помощью команды transport input.
+```
+R1(config)#line vty 0 4
+R1(config-line)#transport input ?
+  all     All protocols
+  none    No protocols
+  ssh     TCP/IP SSH protocol
+  telnet  TCP/IP Telnet protocol
+R1(config-line)#transport input all
+```
 b.	Измените способ входа в систему таким образом, чтобы использовалась проверка пользователей по локальной базе учетных записей.
-Шаг 5. Сохраните текущую конфигурацию в файл загрузочной конфигурации.
-Шаг 6. Установите соединение с маршрутизатором по протоколу SSH.
+```
+R1(config-line)#login local
+```
+#### Шаг 5. Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+```
+R1(config-line)#exit
+R1(config)#exit
+R1#
+R1#wr
+Building configuration...
+[OK]
+R1#
+```
+#### Шаг 6. Установите соединение с маршрутизатором по протоколу SSH.
 a.	Запустите Tera Term с PC-A.
-b.	Установите SSH-подключение к R1. Use the username admin and password Adm1nP@55. У вас должно получиться установить SSH-подключение к R1.
 
+Примечание:
+Так как в Cisco Packet Tracer нет Tera Term с PC-A, подключаться по ssh будем через командную строку.
+
+b.	Установите SSH-подключение к R1. Use the username admin and password Adm1nP@55. У вас должно получиться установить SSH-подключение к R1.
+```
+C:\>ssh -l admin 192.168.1.1
+
+Password: 
+
+
+Prohibiting unauthorized access to the device!!!! 
+
+R1#
+```
+Подключились сразу в привилегированный режим роутера R1.
