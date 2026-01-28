@@ -131,28 +131,98 @@ R1#
 ```
 k.	Настройте на маршрутизаторе время.
 
-Так как наш маршрутизатор не подключен к интернету, мы не можем настроить ntp сервер. Будем настраивать вермя вручную.
+Так как наш маршрутизатор не подключен к интернету, мы не можем настроить ntp сервер. Будем настраивать время вручную.
 ```
 R1#clock set 15:02:20 28 January 2026
 R1#show clock
 15:2:26.357 UTC Wed Jan 28 2026
 R1#
 ```
-Закройте окно настройки.
 
 #### Шаг 3. Настройте базовые параметры каждого коммутатора.
 a.	Присвойте коммутатору имя устройства.
+
 b.	Отключите поиск DNS, чтобы предотвратить попытки маршрутизатора неверно преобразовывать введенные команды таким образом, как будто они являются именами узлов.
+
 c.	Назначьте class в качестве зашифрованного пароля привилегированного режима EXEC.
+
 d.	Назначьте cisco в качестве пароля консоли и включите вход в систему по паролю.
+
 e.	Установите cisco в качестве пароля виртуального терминала и активируйте вход.
+
 f.	Зашифруйте открытые пароли.
+
 g.	Создайте баннер с предупреждением о запрете несанкционированного доступа к устройству.
+
 h.	Настройте на коммутаторах время.
+
 i.	Сохранение текущей конфигурации в качестве начальной.
-Закройте окно настройки.
-Шаг 4. Настройте узлы ПК.
+
+##### Коммутатор S1
+```
+Switch>enable
+Switch#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname S1
+S1(config)#no ip domain-lookup 
+S1(config)#enable secret class
+S1(config)#line con 0
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#line vty 0 15
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#service password-encryption 
+S1(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+S1(config)#exit
+S1#clock set 15:53:20 28 January 2026
+S1#show clock
+15:54:29.533 UTC Wed Jan 28 2026
+S1#copy running-config startup-config
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+S1#
+```
+##### Коммутатор S2
+```
+Switch>enable
+Switch#configure t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname S2
+S2(config)#no ip domain-lookup 
+S2(config)#enable secret class
+S2(config)#line con 0
+S2(config-line)#password cisco
+S2(config-line)#login
+S2(config-line)#line vty 0 15
+S2(config-line)#password cisco
+S2(config-line)#login
+S2(config-line)#exit
+S2(config)#service password-encryption 
+S2(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+S2(config)#exit
+S2#
+S2#clock set 16:01:30 28 January 2026
+S2#show clock
+16:1:35.831 UTC Wed Jan 28 2026
+S2#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+S2#
+```
+##### Примечание:
+Для коммутаторов можно было указать в качестве ntp сервера наш роутер, но на данном этапе мы еще не настраиваем ip адреса. Так что дату и время  тоже настраиваем вручную.
+
+#### Шаг 4. Настройте узлы ПК.
 Адреса ПК можно посмотреть в таблице адресации.
+
 Часть 2. Создание сетей VLAN и назначение портов коммутатора
 Во второй части вы создадите VLAN, как указано в таблице выше, на обоих коммутаторах. Затем вы назначите VLAN соответствующему интерфейсу и проверите настройки конфигурации. Выполните следующие задачи на каждом коммутаторе.
 Шаг 1. Создайте сети VLAN на коммутаторах.
