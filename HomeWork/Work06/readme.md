@@ -243,11 +243,59 @@ IP-адрес и маска подсети
 
 ### Часть 2. Создание сетей VLAN и назначение портов коммутатора
 
-Во второй части вы создадите VLAN, как указано в таблице выше, на обоих коммутаторах. Затем вы назначите VLAN соответствующему интерфейсу и проверите настройки конфигурации. Выполните следующие задачи на каждом коммутаторе.
-Шаг 1. Создайте сети VLAN на коммутаторах.
+#### Шаг 1. Создайте сети VLAN на коммутаторах.
+
 a.	Создайте и назовите необходимые VLAN на каждом коммутаторе из таблицы выше.
-Откройте окно конфигурации
+##### Коммутатор S1
+```
+S1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+S1(config)#vlan 10
+S1(config-vlan)#name Management
+S1(config-vlan)#exit
+S1(config)#vlan 20 
+S1(config-vlan)#name Sales
+S1(config-vlan)#exit
+S1(config)#vlan 999
+S1(config-vlan)#name Parking_Lot
+S1(config-vlan)#exit
+```
+##### Коммутатор S2
+```
+S2#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+S2(config)#vlan 10
+S2(config-vlan)#name Management
+S2(config-vlan)#exit
+S2(config)#vlan 30 
+S2(config-vlan)#name Operations
+S2(config-vlan)#exit
+S2(config)#vlan 999
+S2(config-vlan)#name Parking_Lot
+S2(config-vlan)#exit
+```
 b.	Настройте интерфейс управления и шлюз по умолчанию на каждом коммутаторе, используя информацию об IP-адресе в таблице адресации. 
+
+##### Коммутатор S1
+```
+S1(config)#interface vlan 10
+S1(config-if)#
+%LINK-5-CHANGED: Interface Vlan10, changed state to up
+
+S1(config-if)#ip address 192.168.10.11 255.255.255.0
+S1(config-if)#no shutdown
+S1(config-if)#ip default-gateway 192.168.10.1
+```
+##### Коммутатор S2
+```
+S2(config)#interface vlan 10
+S2(config-if)#
+%LINK-5-CHANGED: Interface Vlan10, changed state to up
+
+S2(config-if)#ip address 192.168.10.12 255.255.255.0
+S2(config-if)#no shutdown
+S2(config-if)#ip default-gateway 192.168.10.1
+```
 c.	Назначьте все неиспользуемые порты коммутатора VLAN Parking_Lot, настройте их для статического режима доступа и административно деактивируйте их.
 Примечание. Команда interface range полезна для выполнения этой задачи с минимальным количеством команд.
 Шаг 2. Назначьте сети VLAN соответствующим интерфейсам коммутатора.
