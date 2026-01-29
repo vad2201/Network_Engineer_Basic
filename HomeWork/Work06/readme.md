@@ -297,14 +297,59 @@ S2(config-if)#no shutdown
 S2(config-if)#ip default-gateway 192.168.10.1
 ```
 c.	Назначьте все неиспользуемые порты коммутатора VLAN Parking_Lot, настройте их для статического режима доступа и административно деактивируйте их.
-Примечание. Команда interface range полезна для выполнения этой задачи с минимальным количеством команд.
-Шаг 2. Назначьте сети VLAN соответствующим интерфейсам коммутатора.
+##### Коммутатор S1
+```
+S1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+S1(config)#interface range f0/2-4, f0/7-24, g0/1-2
+S1(config)#switchport mode access
+S1(config)#switchprot access vlan 999
+S1(config-if-range)#shutdown
+```
+##### Коммутатор S2
+```
+S2#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+S2(config)#interface range f0/2-17, f0/19-24, g0/1-2
+S2(config)#switchport mode access
+S2(config)#switchprot access vlan 999
+S2(config-if-range)#shutdown
+```
+
+#### Шаг 2. Назначьте сети VLAN соответствующим интерфейсам коммутатора.
 a.	Назначьте используемые порты соответствующей VLAN (указанной в таблице VLAN выше) и настройте их для режима статического доступа.
+##### Коммутатор S1
+```
+S1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+S1(config)#interface f0/6
+S1(config-if)#switchport mode access
+S1(config-if)#switchport access vlan 20
+S1(config-if)#no shutdown
+S1(config-if)#end
+S1#
+```
+##### Коммутатор S2
+```
+S2#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+S2(config)#interface f0/18
+S2(config-if)#switch mode access
+S2(config-if)#switch access vlan 30
+S2(config-if)#no shutdown
+```
 b.	Убедитесь, что VLAN назначены на правильные интерфейсы.
-Закройте окно настройки.
-Часть 3. Конфигурация магистрального канала стандарта 802.1Q между коммутаторами
+##### Коммутатор S1
+<img width="845" height="264" alt="image" src="https://github.com/user-attachments/assets/10ca86ec-62de-42b7-93e4-6cace20154a1" />
+
+##### Коммутатор S2
+<img width="799" height="258" alt="image" src="https://github.com/user-attachments/assets/5fd97995-4d8c-4a42-a9a3-cc8e90847606" />
+
+### Часть 3. Конфигурация магистрального канала стандарта 802.1Q между коммутаторами
 В части 3 вы вручную настроите интерфейс F0/1 как транк.
-Шаг 1. Вручную настройте магистральный интерфейс F0/1 на коммутаторах S1 и S2.
+
+#### Шаг 1. Вручную настройте магистральный интерфейс F0/1 на коммутаторах S1 и S2.
+
 a.	Настройка статического транкинга на интерфейсе F0/1 для обоих коммутаторов.
 Откройте окно конфигурации
 b.	Установите native VLAN 1000 на обоих коммутаторах.
@@ -317,6 +362,7 @@ c.	Проверка транкинга.
 Вопрос:
 Что произойдет, если G0/0/1 на R1 будет отключен?
 Закройте окно настройки.
+
 Часть 4. Настройка маршрутизации между сетями VLAN
 Шаг 1. Настройте маршрутизатор.
 Откройте окно конфигурации
