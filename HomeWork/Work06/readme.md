@@ -302,18 +302,16 @@ c.	Назначьте все неиспользуемые порты комму�
 S1#configure terminal
 Enter configuration commands, one per line.  End with CNTL/Z.
 S1(config)#interface range f0/2-4, f0/7-24, g0/1-2
-S1(config)#switchport mode access
-S1(config)#switchprot access vlan 999
-S1(config-if-range)#shutdown
+S1(config-if-range)#switchport mode access
+S1(config-if-range)#switchprot access vlan 999
 ```
 ##### Коммутатор S2
 ```
 S2#configure terminal
 Enter configuration commands, one per line.  End with CNTL/Z.
 S2(config)#interface range f0/2-17, f0/19-24, g0/1-2
-S2(config)#switchport mode access
-S2(config)#switchprot access vlan 999
-S2(config-if-range)#shutdown
+S2(config-if-range)#switchport mode access
+S2(config-if-range)#switchprot access vlan 999
 ```
 
 #### Шаг 2. Назначьте сети VLAN соответствующим интерфейсам коммутатора.
@@ -355,7 +353,40 @@ a.	Настройка статического транкинга на инте�
 b.	Установите native VLAN 1000 на обоих коммутаторах.
 c.	Укажите, что VLAN 10, 20, 30 и 1000 могут проходить по транку.
 d.	Проверьте транки, native VLAN и разрешенные VLAN через транк.
-Шаг 2. Вручную настройте магистральный интерфейс F0/5 на коммутаторе S1.
+##### Коммутатор S1
+```
+S1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+S1(config)#vlan 1000
+S1(config-vlan)#exit
+S1(config)#interface f0/1
+S1(config-if)#switchport mode trunk
+S1(config-if)#switchport trunk allowed vlan 10,20,30,1000
+S1(config-if)#switchport trunk native vlan 1000
+S1(config-if)#do show run
+```
+Проверяем транки, native VLAN и разрешенные VLAN через транк.
+
+<img width="1168" height="120" alt="image" src="https://github.com/user-attachments/assets/1b3df63e-d8eb-47e9-b154-4460c0668363" />
+
+##### Коммутатор S2
+```
+S2#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+S2(config)#vlan 1000
+S2(config-vlan)#exit
+S2(config)#interface f0/1
+S2(config-if)#switchport mode trunk 
+S2(config-if)#switchport trunk allowed vlan 10,20,30,1000 
+S2(config-if)#switchport trunk native vlan 1000
+S2(config-if)#do show run
+Building configuration...
+```
+Проверяем транки, native VLAN и разрешенные VLAN через транк.
+
+<img width="489" height="101" alt="image" src="https://github.com/user-attachments/assets/e7191022-b33f-43ca-8206-4c93d444065f" />
+
+#### Шаг 2. Вручную настройте магистральный интерфейс F0/5 на коммутаторе S1.
 a.	Настройте интерфейс S1 F0/5 с теми же параметрами транка, что и F0/1. Это транк до маршрутизатора.
 b.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
 c.	Проверка транкинга.
