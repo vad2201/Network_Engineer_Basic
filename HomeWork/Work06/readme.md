@@ -304,6 +304,7 @@ Enter configuration commands, one per line.  End with CNTL/Z.
 S1(config)#interface range f0/2-4, f0/7-24, g0/1-2
 S1(config-if-range)#switchport mode access
 S1(config-if-range)#switchprot access vlan 999
+S1(config-if-range)#shutdown
 ```
 ##### Коммутатор S2
 ```
@@ -312,6 +313,7 @@ Enter configuration commands, one per line.  End with CNTL/Z.
 S2(config)#interface range f0/2-17, f0/19-24, g0/1-2
 S2(config-if-range)#switchport mode access
 S2(config-if-range)#switchprot access vlan 999
+S2(config-if-range)#shutdown
 ```
 
 #### Шаг 2. Назначьте сети VLAN соответствующим интерфейсам коммутатора.
@@ -388,14 +390,35 @@ Building configuration...
 
 #### Шаг 2. Вручную настройте магистральный интерфейс F0/5 на коммутаторе S1.
 a.	Настройте интерфейс S1 F0/5 с теми же параметрами транка, что и F0/1. Это транк до маршрутизатора.
+```
+S1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+S1(config)#interface f0/5
+S1(config-if)#switchport mode trunk
+S1(config-if)#switchport trunk allowed vlan 10,20,30,1000
+S1(config-if)#switchport trunk native vlan 1000
+```
 b.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+```
+S1(config-if)#end
+S1#
+S1#wr
+Building configuration...
+[OK]
+```
 c.	Проверка транкинга.
+```
+S1(config-if)#do show run
+```
+<img width="496" height="100" alt="image" src="https://github.com/user-attachments/assets/c97f02d1-9eb9-49e9-9dd2-34203da7c2d3" />
+
 Вопрос:
 Что произойдет, если G0/0/1 на R1 будет отключен?
-Закройте окно настройки.
 
-Часть 4. Настройка маршрутизации между сетями VLAN
-Шаг 1. Настройте маршрутизатор.
+Если G0/0/1 на R1 будет отключен - не будет доступен шлюз по умолчанию для коммутаторов и компьютеров, соответственно связь будет только между двумя коммутаторами.
+
+### Часть 4. Настройка маршрутизации между сетями VLAN
+#### Шаг 1. Настройте маршрутизатор.
 Откройте окно конфигурации
 a.	При необходимости активируйте интерфейс G0/0/1 на маршрутизаторе.
 b.	Настройте подинтерфейсы для каждой VLAN, как указано в таблице IP-адресации. Все подинтерфейсы используют инкапсуляцию 802.1Q. Убедитесь, что подинтерфейсу для native VLAN не назначен IP-адрес. Включите описание для каждого подинтерфейса.
@@ -411,14 +434,3 @@ c.	Отправьте команду ping с компьютера PC-A на ко
 В окне командной строки на PC-B выполните команду tracert на адрес PC-A.
 Вопрос:
 Какие промежуточные IP-адреса отображаются в результатах?
-Сводная таблица по интерфейсам маршрутизаторов
-Модель маршрутизатора	Интерфейс Ethernet № 1	Интерфейс Ethernet № 2	Последовательный интерфейс № 1	Последовательный интерфейс № 2
-1 800	Fast Ethernet 0/0 (F0/0)	Fast Ethernet 0/1 (F0/1)	Serial 0/0/0 (S0/0/0)	Serial 0/0/1 (S0/0/1)
-1900	Gigabit Ethernet 0/0 (G0/0)	Gigabit Ethernet 0/1 (G0/1)	Serial 0/0/0 (S0/0/0)	Serial 0/0/1 (S0/0/1)
-2801	Fast Ethernet 0/0 (F0/0)	Fast Ethernet 0/1 (F0/1)	Serial 0/1/0 (S0/1/0)	Serial 0/1/1 (S0/1/1)
-2811	Fast Ethernet 0/0 (F0/0)	Fast Ethernet 0/1 (F0/1)	Serial 0/0/0 (S0/0/0)	Serial 0/0/1 (S0/0/1)
-2900	Gigabit Ethernet 0/0 (G0/0)	Gigabit Ethernet 0/1 (G0/1)	Serial 0/0/0 (S0/0/0)	Serial 0/0/1 (S0/0/1)
-4221	Gigabit Ethernet 0/0/0 (G0/0/0)	Gigabit Ethernet 0/0/1 (G0/0/1)	Serial 0/1/0 (S0/1/0)	Serial 0/1/1 (S0/1/1)
-4300	Gigabit Ethernet 0/0/0 (G0/0/0)	Gigabit Ethernet 0/0/1 (G0/0/1)	Serial 0/1/0 (S0/1/0)	Serial 0/1/1 (S0/1/1)
-Примечание. Чтобы определить конфигурацию маршрутизатора, можно посмотреть на интерфейсы и установить тип маршрутизатора и количество его интерфейсов. Перечислить все комбинации конфигураций для каждого класса маршрутизаторов невозможно. Эта таблица содержит идентификаторы для возможных комбинаций интерфейсов Ethernet и последовательных интерфейсов на устройстве. Другие типы интерфейсов в таблице не представлены, хотя они могут присутствовать в данном конкретном маршрутизаторе. В качестве примера можно привести интерфейс ISDN BRI. Строка в скобках — это официальное сокращение, которое можно использовать в командах Cisco IOS для обозначения интерфейса.
-Конец документа
