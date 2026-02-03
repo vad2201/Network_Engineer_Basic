@@ -419,13 +419,44 @@ S1(config-if)#do show run
 
 ### Часть 4. Настройка маршрутизации между сетями VLAN
 #### Шаг 1. Настройте маршрутизатор.
-Откройте окно конфигурации
 a.	При необходимости активируйте интерфейс G0/0/1 на маршрутизаторе.
+```
+R1(config)#int G0/0/1
+R1(config-if)#description trunk link to S1
+R1(config-if)#no shutdown
+```
 b.	Настройте подинтерфейсы для каждой VLAN, как указано в таблице IP-адресации. Все подинтерфейсы используют инкапсуляцию 802.1Q. Убедитесь, что подинтерфейсу для native VLAN не назначен IP-адрес. Включите описание для каждого подинтерфейса.
+```
+R1(config)#interface G0/0/1.10
+R1(config-subif)#description default gateway for Management
+R1(config-subif)#encapsulation dot1Q 10
+R1(config-subif)#ip address 192.168.10.1 255.255.255.0
+R1(config-subif)#exit
+R1(config)#int G0/0/1.20
+R1(config-subif)#description default gateway for Sales
+R1(config-subif)#encapsulation dot1Q 20
+R1(config-subif)#ip address 192.168.20.1 255.255.255.0
+R1(config-subif)#exit
+R1(config)#
+R1(config)#int G0/0/1.30
+R1(config-subif)#description default gateway for Operations
+R1(config-subif)#encapsulation dot1Q 30
+R1(config-subif)#ip address 192.168.30.1 255.255.255.0
+R1(config-subif)#exit
+R1(config)#int G0/0/1.1000
+R1(config-subif)#description default gateway for Native
+R1(config-subif)#encapsulation dot1Q 1000
+R1(config-subif)#exit
+R1(config)#
+```
 c.	Убедитесь, что вспомогательные интерфейсы работают
-Закройте окно настройки.
-Часть 5. Проверьте, работает ли маршрутизация между VLAN
-Шаг 1. Выполните следующие тесты с PC-A. Все должно быть успешно.
+```
+R1(config)#do show run
+```
+<img width="511" height="403" alt="image" src="https://github.com/user-attachments/assets/b760a5c2-89ce-4247-8a61-2a609ccb73c6" />
+
+### Часть 5. Проверьте, работает ли маршрутизация между VLAN
+#### Шаг 1. Выполните следующие тесты с PC-A. Все должно быть успешно.
 Примечание. Возможно, вам придется отключить брандмауэр ПК для работы ping
 a.	Отправьте эхо-запрос с PC-A на шлюз по умолчанию.
 b.	Отправьте эхо-запрос с PC-A на PC-B.
