@@ -256,8 +256,14 @@ S1(config-vlan)#exit
 S1(config)#vlan 20 
 S1(config-vlan)#name Sales
 S1(config-vlan)#exit
+S1(config)#vlan 30 
+S1(config-vlan)#name Operations
+S1(config-vlan)#exit
 S1(config)#vlan 999
 S1(config-vlan)#name Parking_Lot
+S1(config-vlan)#exit
+S1(config)#vlan 1000
+S1(config-vlan)#name Own
 S1(config-vlan)#exit
 ```
 ##### Коммутатор S2
@@ -267,11 +273,17 @@ Enter configuration commands, one per line.  End with CNTL/Z.
 S2(config)#vlan 10
 S2(config-vlan)#name Management
 S2(config-vlan)#exit
+S2(config)#vlan 20 
+S2(config-vlan)#name Sales
+S2(config-vlan)#exit
 S2(config)#vlan 30 
 S2(config-vlan)#name Operations
 S2(config-vlan)#exit
 S2(config)#vlan 999
 S2(config-vlan)#name Parking_Lot
+S2(config-vlan)#exit
+S2(config)#vlan 1000
+S2(config-vlan)#name Own
 S2(config-vlan)#exit
 ```
 b.	Настройте интерфейс управления и шлюз по умолчанию на каждом коммутаторе, используя информацию об IP-адресе в таблице адресации. 
@@ -359,8 +371,6 @@ d.	Проверьте транки, native VLAN и разрешенные VLAN �
 ```
 S1#configure terminal
 Enter configuration commands, one per line.  End with CNTL/Z.
-S1(config)#vlan 1000
-S1(config-vlan)#exit
 S1(config)#interface f0/1
 S1(config-if)#switchport mode trunk
 S1(config-if)#switchport trunk allowed vlan 10,20,30,1000
@@ -375,8 +385,6 @@ S1(config-if)#do show run
 ```
 S2#configure terminal
 Enter configuration commands, one per line.  End with CNTL/Z.
-S2(config)#vlan 1000
-S2(config-vlan)#exit
 S2(config)#interface f0/1
 S2(config-if)#switchport mode trunk 
 S2(config-if)#switchport trunk allowed vlan 10,20,30,1000 
@@ -461,11 +469,27 @@ R1(config)#do show run
 a.	Отправьте эхо-запрос с PC-A на шлюз по умолчанию.
 
 <img width="575" height="263" alt="image" src="https://github.com/user-attachments/assets/fea33e13-96dd-4163-bdc6-193d801c92b4" />
+
 Связь успешно установлена.
+
 b.	Отправьте эхо-запрос с PC-A на PC-B.
 
+<img width="574" height="265" alt="image" src="https://github.com/user-attachments/assets/ceade3ac-a8fd-435e-8079-874e36b13966" />
+
+Связь успешно установлена.
+
 c.	Отправьте команду ping с компьютера PC-A на коммутатор S2.
+
+<img width="578" height="267" alt="image" src="https://github.com/user-attachments/assets/bc0fa716-164f-4b03-a79d-2d6fb9e24f13" />
+
+Связь успешно установлена.
+
 Шаг 2. Пройдите следующий тест с PC-B
 В окне командной строки на PC-B выполните команду tracert на адрес PC-A.
+
+<img width="606" height="166" alt="image" src="https://github.com/user-attachments/assets/a8354e06-7b9e-4c9a-a74c-c87f7deb981e" />
+
 Вопрос:
 Какие промежуточные IP-адреса отображаются в результатах?
+
+В команде tracert отображается адрес шлюза по умолчанию (он находится на роутере).
