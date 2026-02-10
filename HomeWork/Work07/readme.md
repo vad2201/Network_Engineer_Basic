@@ -198,8 +198,83 @@ S3#
 Для каждого экземпляра протокола spanning-tree (коммутируемая сеть LAN или широковещательный домен) существует коммутатор, выделенный в качестве корневого моста. Корневой мост служит точкой привязки для всех расчётов протокола spanning-tree, позволяя определить избыточные пути, которые следует заблокировать.
 Процесс выбора определяет, какой из коммутаторов станет корневым мостом. Коммутатор с наименьшим значением идентификатора моста (BID) становится корневым мостом. Идентификатор BID состоит из значения приоритета моста, расширенного идентификатора системы и MAC-адреса коммутатора. Значение приоритета может находиться в диапазоне от 0 до 65535 с шагом 4096. По умолчанию используется значение 32768.
 #### Шаг 1:	Отключите все порты на коммутаторах.
+Коммутатор S1
+```
+S1(config)#inter range f0/1-24
+S1(config-if-range)#shutdown
+S1(config-if-range)#inter range g0/1-2
+S1(config-if-range)#shutdown
+S1(config-if-range)#end
+S1#
+```
+Коммутатор S2 
+```
+S2(config)#interface range f0/1-24
+S2(config-if-range)#shutdown
+S2(config-if-range)#interface range g0/1-2
+S2(config-if-range)#shutdown
+S2(config-if-range)#end
+S2#
+```
+Коммутатор S3
+```
+S3(config)#interface range f0/1-24
+S3(config-if-range)#shutdown
+S3(config-if-range)#interface range g0/1-2
+S3(config-if-range)#shutdown
+S3(config-if-range)#end
+S3#
+```
 #### Шаг 2:	Настройте подключенные порты в качестве транковых.
+Коммутатор S1 
+```
+S1(config)#vlan 1000
+S1(config-vlan)#name NATIVE
+S1(config-vlan)#exit
+S1(config)#interface range f0/2, f0/4
+S1(config-if-range)#switchport mode trunk
+S1(config-if-range)#switchport trunk allowed vlan 1,1000
+S1(config-if-range)#switchport trunk native vlan 1000
+S1(config-if-range)#exit
+```
+Коммутатор S2 
+```
+S2(config)#vlan 1000
+S2(config-vlan)#name NATIVE
+S2(config-vlan)#exit
+S2(config)#interface range f0/2, f0/4
+S2(config-if-range)#switchport mode trunk
+S2(config-if-range)#switchport trunk allowed vlan 1,1000
+S2(config-if-range)#switchport trunk native vlan 1000
+S2(config-if-range)#exit
+```
+Коммутатор S3 
+```
+S3(config)#vlan 1000
+S3(config-vlan)#name NATIVE
+S3(config-vlan)#exit
+S3(config)#interface range f0/2, f0/4
+S3(config-if-range)#switchport mode trunk
+S3(config-if-range)#switchport trunk allowed vlan 1,1000
+S3(config-if-range)#switchport trunk native vlan 1000
+S3(config-if-range)#exit
+```
 #### Шаг 3:	Включите порты F0/2 и F0/4 на всех коммутаторах.
+Коммутаор S1 
+```
+S1(config)#interface range f0/2, f0/4
+S1(config-if-range)#no shutdown
+```
+Коммутаор S2
+```
+S2(config)#interface range f0/2, f0/4
+S2(config-if-range)#no shutdown
+```
+Коммутаор S3 
+```
+S3(config)#interface range f0/2, f0/4
+S3(config-if-range)#no shutdown
+```
 #### Шаг 4:	Отобразите данные протокола spanning-tree.
 Введите команду show spanning-tree на всех трех коммутаторах. Приоритет идентификатора моста рассчитывается путем сложения значений приоритета и расширенного идентификатора системы. Расширенным идентификатором системы всегда является номер сети VLAN. В примере ниже все три коммутатора имеют равные значения приоритета идентификатора моста (32769 = 32768 + 1, где приоритет по умолчанию = 32768, номер сети VLAN = 1); следовательно, коммутатор с самым низким значением MAC-адреса становится корневым мостом (в примере — S2).
 S1# show spanning-tree
