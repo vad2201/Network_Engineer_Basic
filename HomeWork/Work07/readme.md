@@ -276,67 +276,23 @@ S3(config)#interface range f0/2, f0/4
 S3(config-if-range)#no shutdown
 ```
 #### Шаг 4:	Отобразите данные протокола spanning-tree.
-Введите команду show spanning-tree на всех трех коммутаторах. Приоритет идентификатора моста рассчитывается путем сложения значений приоритета и расширенного идентификатора системы. Расширенным идентификатором системы всегда является номер сети VLAN. В примере ниже все три коммутатора имеют равные значения приоритета идентификатора моста (32769 = 32768 + 1, где приоритет по умолчанию = 32768, номер сети VLAN = 1); следовательно, коммутатор с самым низким значением MAC-адреса становится корневым мостом (в примере — S2).
-S1# show spanning-tree
+Введите команду show spanning-tree на всех трех коммутаторах. Приоритет идентификатора моста рассчитывается путем сложения значений приоритета и расширенного идентификатора системы. Расширенным идентификатором системы всегда является номер сети VLAN. В примере ниже все три коммутатора имеют равные значения приоритета идентификатора моста (32769 = 32768 + 1, где приоритет по умолчанию = 32768, номер сети VLAN = 1); 
+Коммутатор S1 
+<img width="794" height="349" alt="image" src="https://github.com/user-attachments/assets/b1a08782-0158-462a-9a3f-9638869550fb" />
 
-VLAN0001
-  Spanning tree enabled protocol ieee
-  Root ID    Priority    32769
-             Address     0cd9.96d2.4000
-             Cost        19
-             Port        2 (FastEthernet0/2)
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+Коммутатор S2
+<img width="793" height="371" alt="image" src="https://github.com/user-attachments/assets/3c607dd7-4af3-4881-873e-0bd70c53d334" />
 
-  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
-             Address     0cd9.96e8.8a00
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
-             Aging Time  300 sec
+Коммутатор S3 
+<img width="791" height="386" alt="image" src="https://github.com/user-attachments/assets/d197fa4f-b62c-4972-8aae-5cebe23c77ba" />
 
-Interface           Role Sts Cost      Prio.Nbr Type
-------------------- ---- --- --------- -------- --------------------------------
-Fa0/2               Root FWD 19        128.2    P2p 
-Fa0/4               Altn BLK 19        128.4    P2p
-
-S2# show spanning-tree
-
-VLAN0001
-  Spanning tree enabled protocol ieee
-  Root ID    Priority    32769
-             Address     0cd9.96d2.4000
-             This bridge is the root
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
-
-  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
-             Address     0cd9.96d2.4000
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
-             Aging Time  300 sec
-
-Interface           Role Sts Cost      Prio.Nbr Type
-------------------- ---- --- --------- -------- --------------------------------
-Fa0/2               Desg FWD 19        128.2    P2p 
-Fa0/4               Desg FWD 19        128.4    P2p
-
-S3# show spanning-tree
-
-VLAN0001
-  Spanning tree enabled protocol ieee
-  Root ID    Priority    32769
-             Address     0cd9.96d2.4000
-             Cost        19
-             Port        2 (FastEthernet0/2)
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
-
-  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
-             Address     0cd9.96e8.7400
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
-             Aging Time  300 sec
-
-Interface           Role Sts Cost      Prio.Nbr Type
-------------------- ---- --- --------- -------- --------------------------------
-Fa0/2               Root FWD 19        128.2    P2p 
-Fa0/4               Desg FWD 19        128.4    P2p
-
+Mac адреса коммутаторов:
+S1 - 0003.E4C7.6105
+S2 - 000A.41B5.D217
+S3 - 0006.2A36.6A56
+Коммутатор с самым низким значением MAC-адреса становится корневым мостом — S2.
 Примечание. Режим STP по умолчанию на коммутаторе 2960 — протокол STP для каждой сети VLAN (PVST).
+Мы подключили быстрый режим rapid-pvst.
 В схему ниже запишите роль и состояние (Sts) активных портов на каждом коммутаторе в топологии.
  
 С учетом выходных данных, поступающих с коммутаторов, ответьте на следующие вопросы.
