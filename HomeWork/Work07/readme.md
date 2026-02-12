@@ -349,95 +349,40 @@ S3 - 0006.2A36.6A56
 ### Часть 3:	Наблюдение за процессом выбора протоколом STP порта, исходя из стоимости портов
 Алгоритм протокола spanning-tree (STA) использует корневой мост как точку привязки, после чего определяет, какие порты будут заблокированы, исходя из стоимости пути. Порт с более низкой стоимостью пути является предпочтительным. Если стоимости портов равны, процесс сравнивает BID. Если BID равны, для определения корневого моста используются приоритеты портов. Наиболее низкие значения являются предпочтительными. В части 3 вам предстоит изменить стоимость порта, чтобы определить, какой порт будет заблокирован протоколом spanning-tree.
 #### Шаг 1:	Определите коммутатор с заблокированным портом.
-При текущей конфигурации только один коммутатор может содержать заблокированный протоколом STP порт. Выполните команду show spanning-tree на обоих коммутаторах некорневого моста. В примере ниже протокол spanning-tree блокирует порт F0/4 на коммутаторе с самым высоким идентификатором BID (S1).
-S1# show spanning-tree
+При текущей конфигурации только один коммутатор может содержать заблокированный протоколом STP порт. Выполните команду show spanning-tree на обоих коммутаторах некорневого моста.
 
-VLAN0001
-  Spanning tree enabled protocol ieee
-  Root ID    Priority    32769
-             Address     0cd9.96d2.4000
-             Cost        19
-             Port        2 (FastEthernet0/2)
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+Коммутатор S2
 
-  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
-             Address     0cd9.96e8.8a00
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
-             Aging Time  300 sec
+<img width="793" height="371" alt="image" src="https://github.com/user-attachments/assets/3c607dd7-4af3-4881-873e-0bd70c53d334" />
 
-Interface           Role Sts Cost      Prio.Nbr Type
-------------------- ---- --- --------- -------- --------------------------------
-Fa0/2               Root FWD 19        128.2    P2p 
-Fa0/4               Altn BLK 19        128.4    P2p
+Коммутатор S3 
 
-S3# show spanning-tree
+<img width="791" height="386" alt="image" src="https://github.com/user-attachments/assets/d197fa4f-b62c-4972-8aae-5cebe23c77ba" />
 
-VLAN0001
-  Spanning tree enabled protocol ieee
-  Root ID    Priority    32769
-             Address     0cd9.96d2.4000
-             Cost        19
-             Port        2 (FastEthernet0/2)
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+Коммутатор S2 - коммутатор с заблокированным портом f0/4.
 
-  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
-             Address     0cd9.96e8.7400
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
-             Aging Time  15  sec
-
-Interface           Role Sts Cost      Prio.Nbr Type
-------------------- ---- --- --------- -------- --------------------------------
-Fa0/2               Root FWD 19        128.2    P2p 
-Fa0/4               Desg FWD 19        128.4    P2p
-Примечание. В конкретной топологии корневой мост может отличаться от выбора порта.
 #### Шаг 2:	Измените стоимость порта.
 Помимо заблокированного порта, единственным активным портом на этом коммутаторе является порт, выделенный в качестве порта корневого моста. Уменьшите стоимость этого порта корневого моста до 18, выполнив команду spanning-tree vlan 1 cost 18 режима конфигурации интерфейса.
-S1(config)# interface f0/2
-S1(config-if)# spanning-tree vlan 1 cost 18
+```
+S2(config)#inter f0/2
+S2(config-if)#spanning-tree vlan 1 cost 18
+```
 #### Шаг 3:	Просмотрите изменения протокола spanning-tree.
-Повторно выполните команду show spanning-tree на обоих коммутаторах некорневого моста. Обратите внимание, что ранее заблокированный порт (S1 – F0/4) теперь является назначенным портом, и протокол spanning-tree теперь блокирует порт на другом коммутаторе некорневого моста (S3 – F0/4).
-S1# show spanning-tree
+После изменения стоимости порта на коммутаторе S2, ничего не произошло. Пришлось отключить порты на коммутаторах и потом включить, чтобы прошли перевыборы.
+Коммутатор S2
 
-VLAN0001
-  Spanning tree enabled protocol ieee
-  Root ID    Priority    32769
-             Address     0cd9.96d2.4000
-             Cost        18
-             Port        2 (FastEthernet0/2)
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+<img width="839" height="367" alt="image" src="https://github.com/user-attachments/assets/17ba5115-12a2-46e2-a57c-17bc0d1e0799" />
 
-  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
-             Address     0cd9.96e8.8a00
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
-             Aging Time  300 sec
+Коммутатор S3
 
-Interface           Role Sts Cost      Prio.Nbr Type
-------------------- ---- --- --------- -------- --------------------------------
-Fa0/2               Root FWD 18        128.2    P2p 
-Fa0/4               Desg FWD 19        128.4    P2p
+<img width="807" height="371" alt="image" src="https://github.com/user-attachments/assets/32a2c8b5-b39f-4c99-af07-363c63c046b9" />
 
-S3# show spanning-tree
+Ранее заблокированный порт (S2 – F0/4) теперь является назначенным портом, и протокол spanning-tree теперь блокирует порт на другом коммутаторе некорневого моста (S3 – F0/2).
 
-VLAN0001
-  Spanning tree enabled protocol ieee
-  Root ID    Priority    32769
-             Address     0cd9.96d2.4000
-             Cost        19
-             Port        2 (FastEthernet0/2)
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+##### Почему протокол spanning-tree заменяет ранее заблокированный порт на назначенный порт и блокирует порт, который был назначенным портом на другом коммутаторе?
+Алгоритм протокола spanning-tree (STA) использует корневой мост как точку привязки, после чего определяет, какие порты будут заблокированы, исходя из стоимости пути. 
+Так как мы уменьшили стоимость корневого порта S2 по сравнению с S3,  то альтернативный порт будет на коммутаторе S3 (порт f0/2, порт f0/4 является корневым).
 
-  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
-             Address     0cd9.96e8.7400
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
-             Aging Time  300 sec
-
-Interface           Role Sts Cost      Prio.Nbr Type
-------------------- ---- --- --------- -------- --------------------------------
-Fa0/2               Root FWD 19        128.2    P2p 
-Fa0/4               Altn BLK 19        128.4    P2p
-Почему протокол spanning-tree заменяет ранее заблокированный порт на назначенный порт и блокирует порт, который был назначенным портом на другом коммутаторе?
-_______________________________________________________________________________________
-_______________________________________________________________________________________
 #### Шаг 4:	Удалите изменения стоимости порта.
 a.	Выполните команду no spanning-tree vlan 1 cost 18 режима конфигурации интерфейса, чтобы удалить запись стоимости, созданную ранее.
 S1(config)# interface f0/2
