@@ -11,10 +11,10 @@
 |R1	|G0/0/1.100|192.168.1.1	|255.255.255.192|-|
 |R1	|G0/0/1.200|192.168.1.65|255.255.255.224|-|
 |R1	|G0/0/1.1000|	|	|-|
-|R2	|G0/0|	10.0.0.2|	255.255.255.252|-|
+|R2	|G0/0/0|	10.0.0.2|	255.255.255.252|-|
 |R2	|G0/0/1|192.168.1.97	|255.255.255.240	||
 |S1	|VLAN 200|	192.168.1.66|255.255.255.224|192.168.1.65 |
-|S2	|VLAN 1|	|	| |
+|S2	|VLAN 1|192.168.1.98	|	255.255.255.240|192.168.1.97 |
 |PC-A	|NIC|DHCP	|DHCP	|DHCP |
 |PC-B	|NIC|DHCP	|DHCP	|DHCP |
 
@@ -99,6 +99,8 @@ c.	Одна подсеть «Подсеть C», поддерживающая 12
 11111111.11111111.11111111.11110000  -   маска   /28
 IP-адрес в таблице адресации для R2 G0/0/1
 192.168.1.97 /28
+IP-адрес в таблице адресов для S2 VLAN 1
+192.168.1.98 /28
 ```
 
 #### Шаг 2.	Создайте сеть согласно топологии.
@@ -274,26 +276,155 @@ Building configuration...
 [OK]
 ```
 #### Шаг 6.	Настройте базовые параметры каждого коммутатора.
+Произведем инициализацию коммутаторов
+```
+Switch#erase startup-config 
+Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]
+[OK]
+Erase of nvram: complete
+%SYS-7-NV_BLOCK_INIT: Initialized the geometry of nvram
+Switch#delete flash:vlan.dat
+Delete filename [vlan.dat]?
+Delete flash:/vlan.dat? [confirm]
+%Error deleting flash:/vlan.dat (No such file or directory)
+
+Switch#reload
+Proceed with reload? [confirm]
+```
+Выполняем процедуру для каждого коммутатора.
+
 a.	Присвойте коммутатору имя устройства.
-Откройте окно конфигурации
+
 b.	Отключите поиск DNS, чтобы предотвратить попытки маршрутизатора неверно преобразовывать введенные команды таким образом, как будто они являются именами узлов.
+
 c.	Назначьте class в качестве зашифрованного пароля привилегированного режима EXEC.
+
 d.	Назначьте cisco в качестве пароля консоли и включите вход в систему по паролю.
+
 e.	Назначьте cisco в качестве пароля VTY и включите вход в систему по паролю.
+
 f.	Зашифруйте открытые пароли.
+
 g.	Создайте баннер с предупреждением о запрете несанкционированного доступа к устройству.
+
 h.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+
 i.	Установите часы на маршрутизаторе на сегодняшнее время и дату.
-Примечание. Вопросительный знак (?) позволяет открыть справку с правильной последовательностью параметров, необходимых для выполнения этой команды.
+
 j.	Скопируйте текущую конфигурацию в файл загрузочной конфигурации.
+
+Коммутатор S1 
+```
+Switch>enable
+Switch#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname S1
+S1(config)#no ip domain-lookup
+S1(config)#enable secret class
+S1(config)#line con 0
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#line vty 0 15
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#service password-encryption 
+S1(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+S1(config)#exit
+S1#
+S1#wr
+Building configuration...
+[OK]
+S1#
+S1(config)#exit
+S1#wr
+Building configuration...
+[OK]
+S1#clock set 14:40:30 17 february 2026
+S1#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+S1#
+```
+Коммутатор S2 
+```
+Switch>enable
+Switch#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname S2
+S2(config)#no ip domain-lookup
+S2(config)#enable secret class
+S2(config)#line con 0
+S2(config-line)#password cisco
+S2(config-line)#login
+S2(config-line)#exit
+S2(config)#line vty 0 15
+S2(config-line)#password cisco
+S2(config-line)#login
+S2(config-line)#exit
+S2(config)#service password-encryption
+S2(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+S2(config)#exit
+S2#wr
+Building configuration...
+[OK]
+S2#clock set 14:42:30 17 february 2026
+S2#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+S2#
+```
+
 #### Шаг 7.	Создайте сети VLAN на коммутаторе S1.
+
 Примечание. S2 настроен только с базовыми настройками. 
+
 a.	Создайте необходимые VLAN на коммутаторе 1 и присвойте им имена из приведенной выше таблицы.
+```
+S1(config)#vlan 100
+S1(config-vlan)#name Customers
+S1(config-vlan)#exit
+S1(config)#vlan 200
+S1(config-vlan)#name Managament
+S1(config-vlan)#exit
+S1(config)#vlan 1000
+S1(config-vlan)#name Native
+S1(config-vlan)#exit
+S1(config)#vlan 999
+S1(config-vlan)#name Parking_Lot
+S1(config-vlan)#exit
+```
 b.	Настройте и активируйте интерфейс управления на S1 (VLAN 200), используя второй IP-адрес из подсети, рассчитанный ранее. Кроме того установите шлюз по умолчанию на S1.
+```
+S1(config)#int vlan 200
+S1(config-if)#ip address 192.168.1.66 255.255.255.224
+S1(config-if)#ip default-gateway 192.168.1.65
+S1(config-if)#no shutdown
+```
 c.	Настройте и активируйте интерфейс управления на S2 (VLAN 1), используя второй IP-адрес из подсети, рассчитанный ранее. Кроме того, установите шлюз по умолчанию на S2
-d.	Назначьте все неиспользуемые порты S1 VLAN Parking_Lot, настройте их для статического режима доступа и административно деактивируйте их. На S2 административно деактивируйте все неиспользуемые порты.
+```
+S2(config)#int vlan 1
+S2(config-if)#ip address 192.168.1.98 255.255.255.240
+S2(config-if)#ip default-gateway 192.168.1.97
+S2(config-if)#no shutdown
+```
+d.	Назначьте все неиспользуемые порты S1 VLAN Parking_Lot, настройте их для статического режима доступа и административно деактивируйте их. На S2 административно 
+деактивируйте все неиспользуемые порты.
+```
+S1(config)#interface range F0/1-4, F0/7-24, G0/1-2
+S1(config-if-range)#switchport mode access
+S1(config-if-range)#switchport access vlan 999
+S1(config-if-range)#shutdown
+```
 Примечание. Команда interface range полезна для выполнения этой задачи с минимальным количеством команд.
-Закройте окно настройки.
+
 #### Шаг 8.	Назначьте сети VLAN соответствующим интерфейсам коммутатора.
 a.	Назначьте используемые порты соответствующей VLAN (указанной в таблице VLAN выше) и настройте их для режима статического доступа.
 Откройте окно конфигурации
