@@ -199,8 +199,30 @@ R2#
 ```
 #### Шаг 4.	Настройка маршрутизации между сетями VLAN на маршрутизаторе R1
 a.	Активируйте интерфейс G0/0/1 на маршрутизаторе.
+```
+R1(config)#int g0/0/1
+R1(config-if)#no shutdown
+```
 b.	Настройте подинтерфейсы для каждой VLAN в соответствии с требованиями таблицы IP-адресации. Все субинтерфейсы используют инкапсуляцию 802.1Q и назначаются первый полезный адрес из вычисленного пула IP-адресов. Убедитесь, что подинтерфейсу для native VLAN не назначен IP-адрес. Включите описание для каждого подинтерфейса.
+```
+R1(config)#interface G0/0/1.100
+R1(config-subif)#description customers
+R1(config-subif)#encapsulation dot1Q 100
+R1(config-subif)#ip address 192.168.1.1 255.255.255.192
+R1(config-subif)#exit
+R1(config)#int G0/0/1.200
+R1(config-subif)#description Management
+R1(config-subif)#encapsulation dot1Q 200
+R1(config-subif)#ip address 192.168.1.65 255.255.255.224
+R1(config-subif)#exit
+R1(config)#int G0/0/1.1000
+R1(config-subif)#description default gateway for Native
+R1(config-subif)#encapsulation dot1Q 1000
+R1(config-subif)#exit
+R1(config)#
+```
 c.	Убедитесь, что вспомогательные интерфейсы работают.
+
 #### Шаг 5.	Настройте G0/1 на R2, затем G0/0/0 и статическую маршрутизацию для обоих маршрутизаторов
 a.	Настройте G0/0/1 на R2 с первым IP-адресом подсети C, рассчитанным ранее.
 b.	Настройте интерфейс G0/0/0 для каждого маршрутизатора на основе приведенной выше таблицы IP-адресации.
