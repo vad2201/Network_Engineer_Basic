@@ -35,21 +35,19 @@
 #### Часть 1.	Создание сети и настройка основных параметров устройства
 
 #### Шаг 1.	Создание схемы адресации
+
 Подсеть сети 192.168.1.0/24 в соответствии со следующими требованиями:
-a.	Одна подсеть «Подсеть A», поддерживающая 58 хостов (клиентская VLAN на R1).
-Подсеть A
-Запишите первый IP-адрес в таблице адресации для R1 G0/0/1.100 . 
-b.	Одна подсеть «Подсеть B», поддерживающая 28 хостов (управляющая VLAN на R1). 
-Подсеть B:
-Запишите первый IP-адрес в таблице адресации для R1 G0/0/1.200. Запишите второй IP-адрес в таблице адресов для S1 VLAN 200 и введите соответствующий шлюз по умолчанию.
-c.	Одна подсеть «Подсеть C», поддерживающая 12 узлов (клиентская сеть на R2).
-Подсеть C:
-Запишите первый IP-адрес в таблице адресации для R2 G0/0/1.
 ```
 11000000.10101000.00000001.00000000  -   сеть
 11111111.11111111.11111111.00000000  -   маска
 8 бит на подсети
+```
+a.	Одна подсеть «Подсеть A», поддерживающая 58 хостов (клиентская VLAN на R1).
 
+Подсеть A
+
+Запишите первый IP-адрес в таблице адресации для R1 G0/0/1.100 . 
+```
 Делить начинаем с максимальной подсетки  58 хостов
 00111111   - 63 хоста
 Соответственно увеличиваем маску на 2 значения
@@ -64,6 +62,14 @@ c.	Одна подсеть «Подсеть C», поддерживающая 12
 11111111.11111111.11111111.11000000  -   маска   /26
 IP-адрес в таблице адресации для R1 G0/0/1.100
 192.168.1.1 /26
+```
+b.	Одна подсеть «Подсеть B», поддерживающая 28 хостов (управляющая VLAN на R1). 
+
+Подсеть B:
+
+Запишите первый IP-адрес в таблице адресации для R1 G0/0/1.200. 
+Запишите второй IP-адрес в таблице адресов для S1 VLAN 200 и введите соответствующий шлюз по умолчанию.
+```
 «Подсеть B», поддерживающая 28 хостов (управляющая VLAN на R1)
 11000000.10101000.00000001.01000000				192.168.1.64 /26
 11111111.11111111.11111111.11000000  -   маска   /26
@@ -79,6 +85,13 @@ IP-адрес в таблице адресов для S1 VLAN 200
 192.168.1.66 /27
 Шлюз по умолчанию
 192.168.1.65 /27
+```
+c.	Одна подсеть «Подсеть C», поддерживающая 12 узлов (клиентская сеть на R2).
+
+Подсеть C:
+
+Запишите первый IP-адрес в таблице адресации для R2 G0/0/1.
+```
 «Подсеть C», поддерживающая 12 узлов (клиентская сеть на R2)
 11000000.10101000.00000001.01100000
 11111111.11111111.11111111.11100000  -   маска   /27
@@ -93,17 +106,97 @@ IP-адрес в таблице адресации для R2 G0/0/1
 <img width="920" height="123" alt="image" src="https://github.com/user-attachments/assets/efdffd5a-ea2d-45a0-b9af-e31a77e27b78" />
 
 #### Шаг 3.	Произведите базовую настройку маршрутизаторов.
+Произведем инициализацию маршрутизаторов
+```
+Router>enable
+Router#erase startup-config 
+Erasing the nvram filesystem will remove all configuration files! Continue? [confirm]
+[OK]
+Erase of nvram: complete
+%SYS-7-NV_BLOCK_INIT: Initialized the geometry of nvram
+Router#delete flash:vlan.dat
+Delete filename [vlan.dat]?
+Delete flash:/vlan.dat? [confirm]
+%Error deleting flash:/vlan.dat (No such file or directory)
+Router#reload
+Proceed with reload? [confirm]
+Initializing Hardware ...
+```
+Выполняем процедуру для каждого маршрутизатора.
+
 a.	Назначьте маршрутизатору имя устройства.
-Откройте окно конфигурации
+
 b.	Отключите поиск DNS, чтобы предотвратить попытки маршрутизатора неверно преобразовывать введенные команды таким образом, как будто они являются именами узлов.
+
 c.	Назначьте class в качестве зашифрованного пароля привилегированного режима EXEC.
+
 d.	Назначьте cisco в качестве пароля консоли и включите вход в систему по паролю.
+
 e.	Назначьте cisco в качестве пароля VTY и включите вход в систему по паролю.
+
 f.	Зашифруйте открытые пароли.
+
 g.	Создайте баннер с предупреждением о запрете несанкционированного доступа к устройству.
+
 h.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+
 i.	Установите часы на маршрутизаторе на сегодняшнее время и дату.
-Примечание. Вопросительный знак (?) позволяет открыть справку с правильной последовательностью параметров, необходимых для выполнения этой команды.
+Маршрутизатор R1
+```
+Router>enable
+Router#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#hostname R1
+R1(config)#no ip domain-lookup
+R1(config)#enable secret class
+R1(config)#line con 0
+R1(config-line)#password cisco
+R1(config-line)#login
+R1(config-line)#exit
+R1(config)#line vty 0 15
+R1(config-line)#password cisco
+R1(config-line)#login
+R1(config-line)#exit
+R1(config)#service password-encryption
+R1(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+R1(config)#exit
+R1#clock set 10:38:30 17 february 2026
+R1#copy running-config startup-config
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+R1#
+```
+Маршрутизатор R2
+```
+Router>enable
+Router#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#hostname R2
+R2(config)#no ip domain-lookup
+R2(config)#enable secret class
+R2(config)#line con 0
+R2(config-line)#password cisco
+R2(config-line)#login
+R2(config-line)#exit
+R2(config)#line vty 0 15
+R2(config-line)#password cisco
+R2(config-line)#login
+R2(config-line)#exit
+R2(config)#service password-encryption
+R2(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+R2(config)#exit
+R2#clock set 10:40:30 17 february 2026
+R2#copy running-config startup-config
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+R2#
+```
 #### Шаг 4.	Настройка маршрутизации между сетями VLAN на маршрутизаторе R1
 a.	Активируйте интерфейс G0/0/1 на маршрутизаторе.
 b.	Настройте подинтерфейсы для каждой VLAN в соответствии с требованиями таблицы IP-адресации. Все субинтерфейсы используют инкапсуляцию 802.1Q и назначаются первый полезный адрес из вычисленного пула IP-адресов. Убедитесь, что подинтерфейсу для native VLAN не назначен IP-адрес. Включите описание для каждого подинтерфейса.
