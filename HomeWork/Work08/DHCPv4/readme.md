@@ -401,6 +401,8 @@ S1(config)#vlan 999
 S1(config-vlan)#name Parking_Lot
 S1(config-vlan)#exit
 ```
+
+
 b.	Настройте и активируйте интерфейс управления на S1 (VLAN 200), используя второй IP-адрес из подсети, рассчитанный ранее. Кроме того установите шлюз по умолчанию на S1.
 ```
 S1(config)#int vlan 200
@@ -417,20 +419,40 @@ S2(config-if)#no shutdown
 ```
 d.	Назначьте все неиспользуемые порты S1 VLAN Parking_Lot, настройте их для статического режима доступа и административно деактивируйте их. На S2 административно 
 деактивируйте все неиспользуемые порты.
+Коммутатор S1 
 ```
 S1(config)#interface range F0/1-4, F0/7-24, G0/1-2
 S1(config-if-range)#switchport mode access
 S1(config-if-range)#switchport access vlan 999
 S1(config-if-range)#shutdown
 ```
+Коммутатор S2
+```
+S2(config)#int range f0/1-4,f0/6-17,f0/19-24,g0/1-2
+S2(config-if-range)#switchport mode access
+S2(config-if-range)#switchport access vlan 999
+% Access VLAN does not exist. Creating vlan 999
+S2(config-if-range)#shutdown
+```
 Примечание. Команда interface range полезна для выполнения этой задачи с минимальным количеством команд.
 
 #### Шаг 8.	Назначьте сети VLAN соответствующим интерфейсам коммутатора.
 a.	Назначьте используемые порты соответствующей VLAN (указанной в таблице VLAN выше) и настройте их для режима статического доступа.
-Откройте окно конфигурации
+```
+S1(config)#int f0/6
+S1(config-if)#switchport mode access
+S1(config-if)#switchport access vlan 100
+```
+
 b.	Убедитесь, что VLAN назначены на правильные интерфейсы.
+<img width="839" height="330" alt="image" src="https://github.com/user-attachments/assets/03daae69-7c83-4ca6-a79d-bdee996f42c2" />
+
 Вопрос:
+
 Почему интерфейс F0/5 указан в VLAN 1?
+
+По умолчанию все интерфейсы находятся в vlan 1, так как мы не переопределяли f0/5 - он в нем и остался.
+
 #### Шаг 9.	Вручную настройте интерфейс S1 F0/5 в качестве транка 802.1Q.
 a.	Измените режим порта коммутатора, чтобы принудительно создать магистральный канал.
 b.	В рамках конфигурации транка  установите для native  VLAN значение 1000.
