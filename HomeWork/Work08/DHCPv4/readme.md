@@ -223,12 +223,56 @@ R1(config)#
 ```
 c.	Убедитесь, что вспомогательные интерфейсы работают.
 
+<img width="469" height="386" alt="image" src="https://github.com/user-attachments/assets/59a35af5-27c2-4bb1-af8f-c5f0785447d1" />
+
 #### Шаг 5.	Настройте G0/1 на R2, затем G0/0/0 и статическую маршрутизацию для обоих маршрутизаторов
 a.	Настройте G0/0/1 на R2 с первым IP-адресом подсети C, рассчитанным ранее.
+```
+R2(config)#int g0/0/1
+R2(config-if)#ip address 192.168.1.97 255.255.255.240
+```
 b.	Настройте интерфейс G0/0/0 для каждого маршрутизатора на основе приведенной выше таблицы IP-адресации.
 c.	Настройте маршрут по умолчанию на каждом маршрутизаторе, указываемом на IP-адрес G0/0/0 на другом маршрутизаторе.
+
+Маршрутизатор R2
+```
+R2(config)#int g0/0/0
+R2(config-if)#ip address 10.0.0.2  255.255.255.252
+R2(config)#ip default-gateway 10.0.0.1
+R2(config)#no shutdown
+```
 d.	Убедитесь, что статическая маршрутизация работает с помощью пинга до адреса G0/0/1 R2 от R1.
+```
+R1#ping 192.168.1.97
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.97, timeout is 2 seconds:
+.....
+Success rate is 0 percent (0/5)
+```
+Маршрутизация не работает. Анализ в режиме Simulation показывает что роутер не понимает за каким интерфейсом находится сеть 192.168.1.96. Необходимо настроить статический маршрут
+```
+R1(config)#ip route  192.168.1.96 255.255.255.240 g0/0/0
+%Default route without gateway, if not a point-to-point interface, may impact performance
+R1(config)#exit
+```
+Проверяем связь
+```
+R1#ping 192.168.1.97
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.1.97, timeout is 2 seconds:
+.!!!!
+Success rate is 80 percent (4/5), round-trip min/avg/max = 0/0/1 ms
+R1#
+```
+Подсеть 192.168.1.96 доступна с R1.
+
 e.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+```
+R1#copy running-config startup-config
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+```
 #### Шаг 6.	Настройте базовые параметры каждого коммутатора.
 a.	Присвойте коммутатору имя устройства.
 Откройте окно конфигурации
