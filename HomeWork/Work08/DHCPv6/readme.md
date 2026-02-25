@@ -1,6 +1,7 @@
 # Лабраторная работа - Настройка DHCPv6 
 
 # Топология
+<img width="1055" height="96" alt="image" src="https://github.com/user-attachments/assets/3b3f774e-a74c-480c-a08e-3dd2bd4f0f2f" />
  
 ### Таблица адресации
 |Устройство|	Интерфейс|IPv6-адрес|
@@ -46,29 +47,166 @@
 В первой части лабораторной работы вам предстоит создать топологию сети и настроить базовые параметры для узлов ПК и коммутаторов.
 #### Шаг 1. Создайте сеть согласно топологии.
 Подключите устройства, как показано в топологии, и подсоедините необходимые кабели.
+<img width="925" height="150" alt="image" src="https://github.com/user-attachments/assets/40ae27f0-5811-4478-841c-0724e8aaf766" />
+
 #### Шаг 2. Настройте базовые параметры каждого коммутатора. (необязательно)
-Откройте окно конфигурации
 a.	Присвойте коммутатору имя устройства.
+
 b.	Отключите поиск DNS, чтобы предотвратить попытки маршрутизатора неверно преобразовывать введенные команды таким образом, как будто они являются именами узлов.
+
 c.	Назначьте class в качестве зашифрованного пароля привилегированного режима EXEC.
+
 d.	Назначьте cisco в качестве пароля консоли и включите вход в систему по паролю.
+
 e.	Назначьте cisco в качестве пароля VTY и включите вход в систему по паролю.
+
 f.	Зашифруйте открытые пароли.
+
 g.	Создайте баннер с предупреждением о запрете несанкционированного доступа к устройству.
+
 h.	Отключите все неиспользуемые порты.
+
 i.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
-Закройте окно настройки.
+
+Коммутатор S1 
+```
+Switch>enable
+Switch#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname S1
+S1(config)#no ip domain-lookup
+S1(config)#enable secret class
+S1(config)#line con 0
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#line vty 0 15
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#service password-encryption 
+S1(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+S1(config)#interface range f0/1-4,f0/7-24,g0/1-2
+S1(config-if-range)#switchport mode access
+S1(config-if-range)#shutdown
+S1(config-if-range)#end
+S1#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+S1#
+```
+Коммутатор S2 
+```
+Switch>enable
+Switch#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname S2
+S2(config)#no ip domain-lookup
+S2(config)#enable secret class
+S2(config)#line con 0
+S2(config-line)#password cisco
+S2(config-line)#login
+S2(config-line)#exit
+S2(config)#line vty 0 15
+S2(config-line)#password cisco
+S2(config-line)#login
+S2(config-line)#exit
+S2(config)#service password-encryption 
+S2(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+S2(config)#interface range f0/1-4,f0/6-17, f0/19-24,g0/1-2
+S2(config-if-range)#switchport mode access
+S2(config-if-range)#shutdown
+S2(config)#end
+S2#copy running-config startup-config 
+Destination filename [startup-config]? 
+%SYS-5-CONFIG_I: Configured from console by console
+
+Building configuration...
+[OK]
+```
 #### Шаг 3. Произведите базовую настройку маршрутизаторов.
-Откройте окно конфигурации
+
 a.	Назначьте маршрутизатору имя устройства.
+
 b.	Отключите поиск DNS, чтобы предотвратить попытки маршрутизатора неверно преобразовывать введенные команды таким образом, как будто они являются именами узлов.
+
 c.	Назначьте class в качестве зашифрованного пароля привилегированного режима EXEC.
+
 d.	Назначьте cisco в качестве пароля консоли и включите вход в систему по паролю.
+
 e.	Назначьте cisco в качестве пароля VTY и включите вход в систему по паролю.
+
 f.	Зашифруйте открытые пароли.
+
 g.	Создайте баннер с предупреждением о запрете несанкционированного доступа к устройству.
+
 h.	Активация IPv6-маршрутизации
+
 i.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
+
+Маршрутизатор R1
+```
+Router>enable
+Router#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#hostname R1 
+R1(config)#no ip domain-lookup
+R1(config)#enable secret class
+R1(config)#line con 0
+R1(config-line)#password cisco
+R1(config-line)#login
+R1(config-line)#exit
+R1(config)#line vty 0 15
+R1(config-line)#password cisco
+R1(config-line)#login
+R1(config-line)#exit
+R1(config)#service password-encryption 
+R1(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+R1#ipv6 unicast-routing
+R1(config)#exit
+R1#copy running-config startup-config 
+Destination filename [startup-config]? 
+%SYS-5-CONFIG_I: Configured from console by console
+
+Building configuration...
+[OK]
+```
+Маршрутизатор R2 
+```
+Router>enable
+Router#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#hostname R2 
+R2(config)#no ip domain-lookup
+R2(config)#enable secret class
+R2(config)#line con 0
+R2(config-line)#password cisco
+R2(config-line)#login
+R2(config-line)#exit
+R2(config)#line vty 0 15
+R2(config-line)#password cisco
+R2(config-line)#login
+R2(config-line)#exit
+R2(config)#service password-encryption 
+R2(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+R2#ipv6 unicast-routing
+R2(config)#exit
+R2#copy running-config startup-config 
+Destination filename [startup-config]? 
+%SYS-5-CONFIG_I: Configured from console by console
+
+Building configuration...
+[OK]
+```
 #### Шаг 4. Настройка интерфейсов и маршрутизации для обоих маршрутизаторов.
 a.	Настройте интерфейсы G0/0/0 и G0/1 на R1 и R2 с адресами IPv6, указанными в таблице выше.
 b.	Настройте маршрут по умолчанию на каждом маршрутизаторе, который указывает на IP-адрес G0/0/0 на другом маршрутизаторе.
