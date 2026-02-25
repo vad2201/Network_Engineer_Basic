@@ -619,13 +619,60 @@ Approximate round trip times in milli-seconds:
 ### Часть 3.	Настройка и проверка DHCP-ретрансляции на R2
 В части 3 настраивается R2 для ретрансляции DHCP-запросов из локальной сети на интерфейсе G0/0/1 на DHCP-сервер (R1). 
 #### Шаг 1.	Настройка R2 в качестве агента DHCP-ретрансляции для локальной сети на G0/0/1
+
 a.	Настройте команду ip helper-address на G0/0/1, указав IP-адрес G0/0/0 R1.
-Откройте окно конфигурации
+
 b.	Сохраните конфигурацию.
+```
+R2(config)#int g0/0/1
+R2(config-if)#ip helper-address 10.0.0.1
+R2(config-if)#end
+R2#wr
+```
 #### Шаг 2.	Попытка получить IP-адрес от DHCP на PC-B
 a.	Из командной строки компьютера PC-B выполните команду ipconfig /all.
 b.	После завершения процесса обновления выполните команду ipconfig для просмотра новой информации об IP-адресе.
+```
+C:\>ipconfig /all
+
+FastEthernet0 Connection:(default port)
+
+   Connection-specific DNS Suffix..: CCNA-lab.com
+   Physical Address................: 000C.8591.BA0C
+   Link-local IPv6 Address.........: FE80::20C:85FF:FE91:BA0C
+   IPv6 Address....................: ::
+   IPv4 Address....................: 192.168.1.102
+   Subnet Mask.....................: 255.255.255.240
+   Default Gateway.................: ::
+                                     192.168.1.97
+   DHCP Servers....................: 10.0.0.1
+   DHCPv6 IAID.....................: 
+   DHCPv6 Client DUID..............: 00-01-00-01-CC-C4-4B-61-00-0C-85-91-BA-0C
+   DNS Servers.....................: ::
+                                     0.0.0.0
+```
+
 c.	Проверьте подключение с помощью пинга IP-адреса интерфейса R1 G0/0/1.
+```
+C:\>ping 10.0.0.1
+
+Pinging 10.0.0.1 with 32 bytes of data:
+
+Reply from 10.0.0.1: bytes=32 time<1ms TTL=254
+Reply from 10.0.0.1: bytes=32 time=1ms TTL=254
+Reply from 10.0.0.1: bytes=32 time<1ms TTL=254
+Reply from 10.0.0.1: bytes=32 time<1ms TTL=254
+
+Ping statistics for 10.0.0.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 1ms, Average = 0ms
+```
+Связь с DHCP сервером есть.
+
 d.	Выполните show ip dhcp binding для R1 для проверки назначений адресов в DHCP.
-e.	Выполните команду show ip dhcp server statistics для проверки сообщени
+
+e.	Выполните команду show ip dhcp server statistics для проверки сообщений DHCP.
+
+Команды show ip dhcp binding и show ip dhcp server statistics не выполняются.
 
