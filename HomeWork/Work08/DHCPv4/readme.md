@@ -416,7 +416,7 @@ S2(config)#int vlan 1
 S2(config-if)#ip address 192.168.1.98 255.255.255.240
 S2(config-if)#no shutdown
 S2(config-if)#exit
-S2(config-if)#ip default-gateway 192.168.1.97
+S2(config)#ip default-gateway 192.168.1.97
 ```
 
 d.	Назначьте все неиспользуемые порты S1 VLAN Parking_Lot, настройте их для статического режима доступа и административно деактивируйте их. На S2 административно 
@@ -491,38 +491,131 @@ e.	Проверьте состояние транка.
 ### Часть 2.	Настройка и проверка двух серверов DHCPv4 на R1
 В части 2 необходимо настроить и проверить сервер DHCPv4 на R1. Сервер DHCPv4 будет обслуживать две подсети, подсеть A и подсеть C.
 #### Шаг 1.	Настройте R1 с пулами DHCPv4 для двух поддерживаемых подсетей. Ниже приведен только пул DHCP для подсети A
+
 a.	Исключите первые пять используемых адресов из каждого пула адресов.
-Откройте окно конфигурации
+
 b.	Создайте пул DHCP (используйте уникальное имя для каждого пула).
+
 c.	Укажите сеть, поддерживающую этот DHCP-сервер.
+
 d.	В качестве имени домена укажите CCNA-lab.com.
+
 e.	Настройте соответствующий шлюз по умолчанию для каждого пула DHCP.
+
 f.	Настройте время аренды на 2 дня 12 часов и 30 минут.
+
 ```
 R1(config)#ip dhcp excluded-address 192.168.1.1 192.168.1.5
 R1(config)#ip dhcp excluded-address 192.168.1.97 192.168.1.101
 R1(config)#ip dhcp pool R1_Client_LAN
 R1(dhcp-config)#network 192.168.1.0 255.255.255.192
+R1(dhcp-config)#domain-name CCNA-lab.com
 R1(dhcp-config)#default-router 192.168.1.1
 ```
 g.	Затем настройте второй пул DHCPv4, используя имя пула R2_Client_LAN и вычислите сеть, маршрутизатор по умолчанию, и используйте то же имя домена и время аренды, что и предыдущий пул DHCP.
 ```
 R1(config)#ip dhcp pool R2_Client_LAN
 R1(dhcp-config)#network 192.168.1.96 255.255.255.240
-R1(dhcp-config)#default-router 192.168.1.97
 R1(dhcp-config)#domain-name CCNA-lab.com
+R1(dhcp-config)#default-router 192.168.1.97
 ```
+Команда времени аренды не выполняется в Cisco Packet Tracer
+```
+lease 2 12 30
+```
+
 #### Шаг 2.	Сохраните конфигурацию.
 Сохраните текущую конфигурацию в файл загрузочной конфигурации.
-Закройте окно настройки.
+```
+R1#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+```
 #### Шаг 3.	Проверка конфигурации сервера DHCPv4
 a.	Чтобы просмотреть сведения о пуле, выполните команду show ip dhcp pool .
+```
+R1#show ip dhcp pool
+
+Pool R1_Client_LAN :
+ Utilization mark (high/low)    : 100 / 0
+ Subnet size (first/next)       : 0 / 0 
+ Total addresses                : 62
+ Leased addresses               : 0
+ Excluded addresses             : 2
+ Pending event                  : none
+
+ 1 subnet is currently in the pool
+ Current index        IP address range                    Leased/Excluded/Total
+ 192.168.1.1          192.168.1.1      - 192.168.1.62      0    / 2     / 62
+
+Pool R2_Client_LAN :
+ Utilization mark (high/low)    : 100 / 0
+ Subnet size (first/next)       : 0 / 0 
+ Total addresses                : 14
+ Leased addresses               : 0
+ Excluded addresses             : 2
+ Pending event                  : none
+
+ 1 subnet is currently in the pool
+ Current index        IP address range                    Leased/Excluded/Total
+ 192.168.1.97         192.168.1.97     - 192.168.1.110     0    / 2     / 14
+```
 b.	Выполните команду show ip dhcp bindings для проверки установленных назначений адресов DHCP.
+```
+R1#show ip dhcp bindings
+```
+Команда не отработала.
+
 c.	Выполните команду show ip dhcp server statistics для проверки сообщений DHCP.
+```
+R1#show ip dhcp server statistics
+```
+Команда не отработала.
 #### Шаг 4.	Попытка получить IP-адрес от DHCP на PC-A
 a.	Из командной строки компьютера PC-A выполните команду ipconfig /all.
 b.	После завершения процесса обновления выполните команду ipconfig для просмотра новой информации об IP-адресе.
+```
+C:\>ipconfig /all
+
+FastEthernet0 Connection:(default port)
+
+   Connection-specific DNS Suffix..: CCNA-lab.com
+   Physical Address................: 0002.4A2C.2967
+   Link-local IPv6 Address.........: FE80::202:4AFF:FE2C:2967
+   IPv6 Address....................: ::
+   IPv4 Address....................: 192.168.1.6
+   Subnet Mask.....................: 255.255.255.192
+   Default Gateway.................: ::
+                                     192.168.1.1
+   DHCP Servers....................: 192.168.1.1
+   DHCPv6 IAID.....................: 
+   DHCPv6 Client DUID..............: 00-01-00-01-49-E7-3E-90-00-02-4A-2C-29-67
+   DNS Servers.....................: ::
+                                     0.0.0.0
+
+Bluetooth Connection:
+
+   Connection-specific DNS Suffix..: CCNA-lab.com
+   Physical Address................: 0003.E41B.58C9
+   Link-local IPv6 Address.........: ::
+```
 c.	Проверьте подключение с помощью пинга IP-адреса интерфейса R0 G0/0/1.
+```
+C:\>ping 192.168.1.1
+
+Pinging 192.168.1.1 with 32 bytes of data:
+
+Reply from 192.168.1.1: bytes=32 time<1ms TTL=255
+Reply from 192.168.1.1: bytes=32 time=2ms TTL=255
+Reply from 192.168.1.1: bytes=32 time<1ms TTL=255
+Reply from 192.168.1.1: bytes=32 time=1ms TTL=255
+
+Ping statistics for 192.168.1.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 2ms, Average = 0ms
+```
 ### Часть 3.	Настройка и проверка DHCP-ретрансляции на R2
 В части 3 настраивается R2 для ретрансляции DHCP-запросов из локальной сети на интерфейсе G0/0/1 на DHCP-сервер (R1). 
 #### Шаг 1.	Настройка R2 в качестве агента DHCP-ретрансляции для локальной сети на G0/0/1
