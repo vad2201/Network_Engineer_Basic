@@ -446,38 +446,58 @@ b.	Сохраните конфигурацию.
 R2(config-if)#end
 R2#wr
 ```
+Для того чтоб настроить DHCP на втором компьютере - настроим DHCP сервер на R2.
+```
+R2(config)#ipv6 dhcp pool R2-STATEFUL 
+R2(config-dhcpv6)#address prefix 2001:db8:acad:3:aaa::/80
+R2(config-dhcpv6)#dns-server 2001:db8:acad::254
+R2(config-dhcpv6)#domain-name STATEFUL.com
+R2(config-dhcpv6)#exit
+R2(config)#interface g0/0/1
+R2(config-if)#ipv6 nd other-config-flag 
+R2(config-if)#ipv6 dhcp server R2-STATEFUL
+R2(config-if)#exit
+```
+Это мы делаем чтобы смоделировать ситуацию для получения ip адреса вторым компьютером.
+
 #### Шаг 3. Попытка получить адрес IPv6 из DHCPv6 на PC-B.
 a.	Перезапустите PC-B.
 b.	Откройте командную строку на PC-B и выполните команду ipconfig /all и проверьте выходные данные, чтобы увидеть результаты операции ретрансляции DHCPv6.
-C:\Users\Student> ipconfig /all
-Windows IP Configuration
+```
+C:\>ipconfig /all
 
-   Host Name . . . . . . . . . . . . : DESKTOP-3FR7RKA
-   Primary Dns Suffix . . . . . . . : 
-   Node Type . . . . . . . . . . . . : Hybrid
-   IP Routing Enabled. . . . . . . . : No
-   WINS Proxy Enabled. . . . . . . . : No
-   DNS Suffix Search List. . . . . . : STATEFUL.com
+FastEthernet0 Connection:(default port)
 
-Ethernet adapter Ethernet0:
+   Connection-specific DNS Suffix..: STATEFUL.com 
+   Physical Address................: 0030.A37A.3A70
+   Link-local IPv6 Address.........: FE80::230:A3FF:FE7A:3A70
+   IPv6 Address....................: 2001:DB8:ACAD:3:AAA:E886:DAF4:CC52
+   IPv4 Address....................: 0.0.0.0
+   Subnet Mask.....................: 0.0.0.0
+   Default Gateway.................: FE80::1
+                                     0.0.0.0
+   DHCP Servers....................: 0.0.0.0
+   DHCPv6 IAID.....................: 2019717178
+   DHCPv6 Client DUID..............: 00-01-00-01-4D-B1-47-63-00-30-A3-7A-3A-70
+   DNS Servers.....................: 2001:DB8:ACAD::254
+                                     0.0.0.0
+```
+Адрес получен с определенным префиксом.
 
-   Connection-specific DNS Suffix . : STATEFUL.com
-   Description . . . . . . . . . . . : Intel(R) 852574L Gigabit Network Connection
-   Physical Address. . . . . . . . . : 00-50-56-B3-7B-06
-   DHCP Enabled. . . . . . . . . . . : Yes
-   Autoconfiguration Enabled . . . . : Yes
-   IPv6 Address. . . . . . . . . . . : 2001:db8:acad3:aaaa:7104:8b7d:5402(Preferred)
-   Lease Obtained. . . . . . . . . . : Sunday, October 6, 2019 3:27:13 PM
-   Lease Expires . . . . . . . . . . Tuesday, October 8, 2019 3:27:13 PM
-   Link-local IPv6-адрес. . . . . : fe80::a0f3:3d39:f9fb:a020%6(Preferred)
-   IPv4 Address. . . . . . . . . . . : 169.254.160.32(Preferred)
-   Subnet Mask . . . . . . . . . . . : 255.255.0.0
-   Default Gateway . . . . . . . . .: fe80። 2% 6
-   DHCPv6 IAID . . . . . . . . . . . : 50334761
-   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-24-F2-08-38-00-50-56-B3-7B-06
-   DNS Servers . . . . . . . . . . . : 2001:db8:acad። 254
-   NetBIOS over Tcpip. . . . . . . . : Включен
-   Список поиска DNS-суффиксов подключения:
-                                       STATEFUL.com
 c.	Проверьте подключение с помощью пинга IP-адреса интерфейса R0 G0/0/1.
+```
+C:\>ping 2001:db8:acad:1::1
 
+Pinging 2001:db8:acad:1::1 with 32 bytes of data:
+
+Reply from 2001:DB8:ACAD:1::1: bytes=32 time<1ms TTL=254
+Reply from 2001:DB8:ACAD:1::1: bytes=32 time=1ms TTL=254
+Reply from 2001:DB8:ACAD:1::1: bytes=32 time=1ms TTL=254
+Reply from 2001:DB8:ACAD:1::1: bytes=32 time=1ms TTL=254
+
+Ping statistics for 2001:DB8:ACAD:1::1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 1ms, Average = 0ms
+```
+Маршрутизатор R1 доступен.
