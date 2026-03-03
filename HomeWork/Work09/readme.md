@@ -443,10 +443,23 @@ Total Addresses in System (excluding one mac per port)     : 0
 Max Addresses limit in System (excluding one mac per port) : 1024
 ```
 d.	Включите безопасность порта для F0 / 18 на S2. Настройте каждый активный порт доступа таким образом, чтобы он автоматически добавлял адреса МАС, изученные на этом порту, в текущую конфигурацию.
+```
+S2(config-if)#switchport port-security
+S2(config-if)#switchport port-security mac-address sticky
+S2(config-if)#
+```
 e.	Настройте следующие параметры безопасности порта на S2 F / 18:
+
 o	Максимальное количество записей MAC-адресов: 2
+
 o	Тип безопасности: Protect
+
 o	Aging time: 60 мин.
+```
+S2(config-if)#switchport port-security maximum 2
+S2(config-if)#switchport port-security violation protect 
+S2(config-if)#switchport port-security aging time 60
+```
 f.	Проверка функции безопасности портов на S2 F0/18.
 S2# show port-security interface f0/18
 Port Security : Enabled
