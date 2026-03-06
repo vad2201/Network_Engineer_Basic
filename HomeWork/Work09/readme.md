@@ -426,10 +426,10 @@ Aging Time                 : 60 mins
 Aging Type                 : Absolute
 SecureStatic Address Aging : Disabled
 Maximum MAC Addresses      : 3
-Total MAC Addresses        : 0
+Total MAC Addresses        : 1
 Configured MAC Addresses   : 0
 Sticky MAC Addresses       : 0
-Last Source Address:Vlan   : 0000.0000.0000:0
+Last Source Address:Vlan   : 0001.C7CD.6584:10
 Security Violation Count   : 0
 
 S1#show port-security address
@@ -438,10 +438,13 @@ S1#show port-security address
 Vlan    Mac Address       Type                          Ports   Remaining Age
                                                                    (mins)
 ----    -----------       ----                          -----   -------------
+10	0001.C7CD.6584	DynamicConfigured	FastEthernet0/6		-
 -----------------------------------------------------------------------------
 Total Addresses in System (excluding one mac per port)     : 0
 Max Addresses limit in System (excluding one mac per port) : 1024
 ```
+VLAN 10 не появился в port-security до тех пор, пока мы на комьютере PC-A не получили ip адрес методом DHCP.
+
 d.	Включите безопасность порта для F0 / 18 на S2. Настройте каждый активный порт доступа таким образом, чтобы он автоматически добавлял адреса МАС, изученные на этом порту, в текущую конфигурацию.
 ```
 S2(config-if)#switchport port-security
@@ -461,32 +464,38 @@ S2(config-if)#switchport port-security violation protect
 S2(config-if)#switchport port-security aging time 60
 ```
 f.	Проверка функции безопасности портов на S2 F0/18.
-S2# show port-security interface f0/18
-Port Security : Enabled
-Port Status : Secure-up
-Violation Mode : Protect
-Aging Time : 60 mins
-Aging Type : Absolute
+```
+S2#show port-security interface f0/18
+Port Security              : Enabled
+Port Status                : Secure-up
+Violation Mode             : Protect
+Aging Time                 : 60 mins
+Aging Type                 : Absolute
 SecureStatic Address Aging : Disabled
-Maximum MAC Addresses : 2
-Total MAC Addresses : 1
-Configured MAC Addresses : 0
-Sticky MAC Addresses : 0
-Last Source Address:Vlan : 0022.5646.3413:10
-Security Violation Count : 0
+Maximum MAC Addresses      : 2
+Total MAC Addresses        : 1
+Configured MAC Addresses   : 0
+Sticky MAC Addresses       : 1
+Last Source Address:Vlan   : 000C.CFAC.557A:10
+Security Violation Count   : 0
 
-S2# show port-security address
+S2#show port-security address
                Secure Mac Address Table
 -----------------------------------------------------------------------------
-Vlan Mac Address Type Ports Remaining Age
+Vlan    Mac Address       Type                          Ports   Remaining Age
                                                                    (mins)
----- ----------- ---- ----- -------------
-  10 0022.5646.3413 SecureSticky Fa0/18 -
+----    -----------       ----                          -----   -------------
+  10    000C.CFAC.557A    SecureSticky                  Fa0/18       -
 -----------------------------------------------------------------------------
-Total Addresses in System (excluding one mac per port) : 0
-Max Addresses limit in System (excluding one mac per port) : 8192
+Total Addresses in System (excluding one mac per port)     : 0
+Max Addresses limit in System (excluding one mac per port) : 1024
+```
+VLAN 10 не появился в port-security до тех пор, пока мы на комьютере PC-B не получили ip адрес методом DHCP.
+
 #### Шаг 5. Реализовать безопасность DHCP snooping.
+
 a.	На S2 включите DHCP snooping и настройте DHCP snooping во VLAN 10.
+
 b.	Настройте магистральные порты на S2 как доверенные порты.
 c.	Ограничьте ненадежный порт Fa0/18 на S2 пятью DHCP-пакетами в секунду.
 d.	Проверка DHCP Snooping на S2.
