@@ -526,12 +526,22 @@ FastEthernet0/18           no         5
 e.	В командной строке на PC-B освободите, а затем обновите IP-адрес.
 C:\Users\Student> ipconfig /release
 C:\Users\Student> ipconfig /renew
+```
+C:\>ipconfig /renew
+
+   IP Address......................: 192.168.10.11
+   Subnet Mask.....................: 255.255.255.0
+   Default Gateway.................: 192.168.10.1
+   DNS Server......................: 0.0.0.0
+```   
 f.	Проверьте привязку отслеживания DHCP с помощью команды show ip dhcp snooping binding.
-S2# show ip dhcp snooping binding 
-MacIp адресAddress Lease(sec) Type VLAN Interface
------------------- --------------- ---------- ------------- ---- --------------------
-00:50:56:90:D0:8E 192.168.10.11 86213 dhcp-snooping 10 FastEthernet0/18
+```
+S2#show ip dhcp snooping binding
+MacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface
+------------------  ---------------  ----------  -------------  ----  -----------------
+00:0C:CF:AC:55:7A   192.168.10.11    0           dhcp-snooping  10    FastEthernet0/18
 Total number of bindings: 1
+```
 #### Шаг 6. Реализация PortFast и BPDU Guard
 a.	Настройте PortFast на всех портах доступа, которые используются на обоих коммутаторах.
 b.	Включите защиту BPDU на портах доступа VLAN 10 S1 и S2, подключенных к PC-A и PC-B.
