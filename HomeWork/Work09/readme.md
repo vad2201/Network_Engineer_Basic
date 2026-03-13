@@ -524,8 +524,11 @@ FastEthernet0/1            yes        unlimited
 FastEthernet0/18           no         5  
 ```
 e.	В командной строке на PC-B освободите, а затем обновите IP-адрес.
+
 C:\Users\Student> ipconfig /release
+
 C:\Users\Student> ipconfig /renew
+
 ```
 C:\>ipconfig /renew
 
@@ -543,23 +546,214 @@ MacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface
 Total number of bindings: 1
 ```
 #### Шаг 6. Реализация PortFast и BPDU Guard
+
 a.	Настройте PortFast на всех портах доступа, которые используются на обоих коммутаторах.
+
+Коммутатор S1 
+```
+S1(config)#interface range f0/5-6
+S1(config-if-range)#spanning-tree portfast
+```
+Коммутатор S2 
+```
+S2(config)#interface f0/18
+S2(config-if)#spanning-tree portfast
+```
 b.	Включите защиту BPDU на портах доступа VLAN 10 S1 и S2, подключенных к PC-A и PC-B.
+
+Коммутатор S1 
+```
+S1(config)#interface f0/6
+S1(config-if)#spanning-tree bpduguard enable
+```
+Коммутатор S2 
+```
+S2(config)#interface f0/18
+S2(config-if)#spanning-tree bpduguard enable
+```
 c.	Убедитесь, что защита BPDU и PortFast включены на соответствующих портах.
-S1# show spanning-tree interface f0/6 detail
- Port 8 (FastEthernet0/6) of VLAN0010 is designated forwarding
-   Port path cost 19, Port priority 128, Port Identifier 128.6.
-   <output omitted for brevity>
-   Number of transitions to forwarding state: 1
-   The port is in the portfast mode
-   Link type is point-to-point by default
-   Bpdu guard is enabled
-   BPDU: sent 128, received 0
+
+Коммутатор S1 
+```
+S1#show spanning-tree interface f0/6 detail
+
+Port 6 (FastEthernet0/6) of VLAN0010 is designated forwarding
+  Port path cost 19, Port priority 128, Port Identifier 128.6
+  Designated root has priority 32778, address 000A.F3D9.BB75
+  Designated bridge has priority 32778, address 000A.F3D9.BB75
+  Designated port id is 128.6, designated path cost 19
+  Timers: message age 16, forward delay 0, hold 0
+  Number of transitions to forwarding state: 1
+  The port is in the portfast mode
+  Link type is point-to-point by default
+
+S1#show run
+
+interface FastEthernet0/6
+ description LINK TO CLIENT
+ switchport access vlan 10
+ switchport mode access
+ switchport port-security
+ switchport port-security maximum 3
+ switchport port-security violation restrict 
+ switchport port-security aging time 60
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+```
+
+Коммутатор S2
+```
+S2#show spanning-tree interface f0/18 detail
+
+
+Port 18 (FastEthernet0/18) of VLAN0010 is designated forwarding
+  Port path cost 19, Port priority 128, Port Identifier 128.18
+  Designated root has priority 32778, address 000A.F3D9.BB75
+  Designated bridge has priority 32778, address 0030.A396.B522
+  Designated port id is 128.18, designated path cost 19
+  Timers: message age 16, forward delay 0, hold 0
+  Number of transitions to forwarding state: 1
+  The port is in the portfast mode
+  Link type is point-to-point by default
+
+S2#show run
+
+interface FastEthernet0/18
+ description LINK TO CLIENT
+ switchport access vlan 10
+ ip dhcp snooping limit rate 5
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+```
+show spanning-tree не показывает что bpduguard включен, но в общей конфигурации по портам это видно (особенность CPT).
+
 #### Шаг 7. Проверьте наличие сквозного ⁪подключения.
 Проверьте PING свзяь между всеми устройствами в таблице IP-адресации. В случае сбоя проверки связи может потребоваться отключить брандмауэр на хостах.
-Закройте окно настройки.
-Вопросы для повторения
-1.	С точки зрения безопасности порта на S2, почему нет значения таймера для оставшегося возраста в минутах, когда было сконфигурировано динамическое обучение - sticky?
-2.	Что касается безопасности порта на S2, если вы загружаете скрипт текущей конфигурации на S2, почему порту 18 на PC-B никогда не получит IP-адрес через DHCP?
-3.	Что касается безопасности порта, в чем разница между типом абсолютного устаревания и типом устаревание по неактивности?
+
+Компьютер PC-A
+```
+C:\>ping 192.168.10.1
+
+Pinging 192.168.10.1 with 32 bytes of data:
+
+Reply from 192.168.10.1: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.1: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.1: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.1: bytes=32 time=1ms TTL=255
+
+Ping statistics for 192.168.10.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 1ms, Average = 0ms
+
+C:\>ping 192.168.10.201
+
+Pinging 192.168.10.201 with 32 bytes of data:
+
+Reply from 192.168.10.201: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.201: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.201: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.201: bytes=32 time<1ms TTL=255
+
+Ping statistics for 192.168.10.201:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+
+C:\>ping 192.168.10.202
+
+Pinging 192.168.10.202 with 32 bytes of data:
+
+Reply from 192.168.10.202: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.202: bytes=32 time=1ms TTL=255
+Reply from 192.168.10.202: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.202: bytes=32 time<1ms TTL=255
+
+Ping statistics for 192.168.10.202:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 1ms, Average = 0ms
+
+C:\>ping 192.168.10.11
+
+Pinging 192.168.10.11 with 32 bytes of data:
+
+Reply from 192.168.10.11: bytes=32 time=9ms TTL=128
+Reply from 192.168.10.11: bytes=32 time=1ms TTL=128
+Reply from 192.168.10.11: bytes=32 time=1ms TTL=128
+Reply from 192.168.10.11: bytes=32 time<1ms TTL=128
+
+Ping statistics for 192.168.10.11:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 9ms, Average = 2ms
+```
+Компьютер PC-B
+```
+C:\>ping 192.168.10.1
+
+Pinging 192.168.10.1 with 32 bytes of data:
+
+Reply from 192.168.10.1: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.1: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.1: bytes=32 time=1ms TTL=255
+Reply from 192.168.10.1: bytes=32 time<1ms TTL=255
+
+Ping statistics for 192.168.10.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 1ms, Average = 0ms
+
+C:\>ping 192.168.10.202
+
+Pinging 192.168.10.202 with 32 bytes of data:
+
+Reply from 192.168.10.202: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.202: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.202: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.202: bytes=32 time<1ms TTL=255
+
+Ping statistics for 192.168.10.202:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+
+C:\>ping 192.168.10.201
+
+Pinging 192.168.10.201 with 32 bytes of data:
+
+Reply from 192.168.10.201: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.201: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.201: bytes=32 time<1ms TTL=255
+Reply from 192.168.10.201: bytes=32 time=1ms TTL=255
+
+Ping statistics for 192.168.10.201:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 1ms, Average = 0ms
+
+C:\>ping 192.168.10.10
+
+Pinging 192.168.10.10 with 32 bytes of data:
+
+Reply from 192.168.10.10: bytes=32 time<1ms TTL=128
+Reply from 192.168.10.10: bytes=32 time<1ms TTL=128
+Reply from 192.168.10.10: bytes=32 time<1ms TTL=128
+Reply from 192.168.10.10: bytes=32 time=1ms TTL=128
+
+Ping statistics for 192.168.10.10:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 1ms, Average = 0ms
+```
+
+#### Вопросы для повторения
+#### 1.	С точки зрения безопасности порта на S2, почему нет значения таймера для оставшегося возраста в минутах, когда было сконфигурировано динамическое обучение - sticky?
+
+
+#### 2.	Что касается безопасности порта на S2, если вы загружаете скрипт текущей конфигурации на S2, почему порту 18 на PC-B никогда не получит IP-адрес через DHCP?
+
+#### 3.	Что касается безопасности порта, в чем разница между типом абсолютного устаревания и типом устаревание по неактивности?
+
 
