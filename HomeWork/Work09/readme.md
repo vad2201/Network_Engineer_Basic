@@ -495,31 +495,34 @@ VLAN 10 не появился в port-security до тех пор, пока мы
 #### Шаг 5. Реализовать безопасность DHCP snooping.
 
 a.	На S2 включите DHCP snooping и настройте DHCP snooping во VLAN 10.
-
+```
+S2(config)#ip dhcp sno
+S2(config)#ip dhcp snooping vlan 10
+```
 b.	Настройте магистральные порты на S2 как доверенные порты.
+```
+S2(config)#int f0/1
+S2(config-if)#ip dhcp snooping trust
+```
 c.	Ограничьте ненадежный порт Fa0/18 на S2 пятью DHCP-пакетами в секунду.
+```
+S2(config)#Int f0/18
+S2(config-if)#ip dhcp snooping limit rate 5
+```
 d.	Проверка DHCP Snooping на S2.
-S2# show ip dhcp snooping
+```
+S2#show ip dhcp snooping
 Switch DHCP snooping is enabled
 DHCP snooping is configured on following VLANs:
 10
-DHCP snooping is operational on following VLANs:
-10
-DHCP snooping is configured on the following L3 Interfaces:
 Insertion of option 82 is enabled
-   circuit-id default format: vlan-mod-port
-   remote-id: 0cd9.96d2.3f80 (MAC)
 Option 82 on untrusted port is not allowed
 Verification of hwaddr field is enabled
-Verification of giaddr field is enabled
-DHCP snooping trust/rate is configured on the following Interfaces:
-
-Interface Trusted Allow option Rate limit (pps)
------------------------ ------- ------------ ----------------
-FastEthernet0/1 yes yes unlimited
-  Custom circuit-ids:
-FastEthernet0/18 no no 5
-  Custom circuit-ids:
+Interface                  Trusted    Rate limit (pps)
+-----------------------    -------    ----------------
+FastEthernet0/1            yes        unlimited       
+FastEthernet0/18           no         5  
+```
 e.	В командной строке на PC-B освободите, а затем обновите IP-адрес.
 C:\Users\Student> ipconfig /release
 C:\Users\Student> ipconfig /renew
