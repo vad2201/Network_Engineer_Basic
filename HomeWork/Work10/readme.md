@@ -287,6 +287,7 @@ R2(config-if)#ip ospf hello-interval 30
 ```
 c.	На R1 настройте статический маршрут по умолчанию, который использует интерфейс Loopback 1 в качестве интерфейса выхода. Затем распространите маршрут по умолчанию в OSPF. Обратите внимание на сообщение консоли после установки маршрута по умолчанию.
 ```
+R1(config)#ip route 0.0.0.0 0.0.0.0 Loopback1 
 R1(config)#route ospf 56
 R1(config-router)#default-information originate 
 R1(config-router)#
@@ -305,6 +306,28 @@ R2(config-router)#
 ```
 f.	Измените базовую пропускную способность для маршрутизаторов. После этой настройки перезапустите OSPF с помощью команды clear ip ospf process . Обратите внимание на сообщение консоли после установки новой опорной полосы пропускания.
 
+Маршрутизатор R1
+```
+R1(config)#router ospf 56
+R1(config-router)#auto-cost
+R1(config-router)#auto-cost reference-bandwidth 10000
+% OSPF: Reference bandwidth is changed.
+        Please ensure reference bandwidth is consistent across all routers.
+R1(config-router)#end
+clear ip ospf process 
+Reset ALL OSPF processes? [no]: y
+```
+Маршрутизатор R2
+```
+R2(config)#router ospf 56
+R2(config-router)#auto-cost reference-bandwidth 10000
+% OSPF: Reference bandwidth is changed.
+        Please ensure reference bandwidth is consistent across all routers.
+R2(config-router)#end
+R2#clear ip ospf process
+Reset ALL OSPF processes? [no]: y
+```
+Сообщение после смены полосы пропускания гласит, что ее надо поменять на всех роутерах в сети.
 #### Шаг 2. Убедитесь, что оптимизация OSPFv2 реализовалась.
 a.	Выполните команду show ip ospf interface g0/0/1 на R1 и убедитесь, что приоритет интерфейса установлен равным 50, а временные интервалы — Hello 30, Dead 120, а тип сети по умолчанию — Broadcast
 b.	На R1 выполните команду show ip route ospf, чтобы убедиться, что сеть R2 Loopback1 присутствует в таблице маршрутизации. Обратите внимание на разницу в метрике между этим выходным и предыдущим выходным. Также обратите внимание, что маска теперь составляет 24 бита, в отличие от 32 битов, ранее объявленных.
