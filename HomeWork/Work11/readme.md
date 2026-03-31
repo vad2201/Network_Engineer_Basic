@@ -253,14 +253,106 @@ S2(config)#
 ```
 b.	Настройте интерфейс управления и шлюз по умолчанию на каждом коммутаторе, используя информацию об IP-адресе в таблице адресации. 
 
+Коммутатор S1
+```
+S1(config)#int vlan 20
+S1(config-if)#
+%LINK-5-CHANGED: Interface Vlan20, changed state to up
+
+S1(config-if)#ip address 10.20.0.2 255.255.255.0
+S1(config-if)#ip default-gateway 10.20.0.1
+```
+Коммутатор S2
+```
+S2(config)#int vlan 20
+S2(config-if)#
+%LINK-5-CHANGED: Interface Vlan20, changed state to up
+
+S2(config-if)#ip address 10.20.0.3 255.255.255.0
+S2(config-if)#ip default-gateway 10.20.0.1
+```
 c.	Назначьте все неиспользуемые порты коммутатора VLAN Parking Lot, настройте их для статического режима доступа и административно деактивируйте их.
 
-Примечание. Команда interface range полезна для выполнения этой задачи с помощью необходимого количества команд. 
+Коммутатор S1
+```
+S1(config)#int range f0/2-4, f0/7-24, g0/1-2
+S1(config-if-range)#switchport mode access
+S1(config-if-range)#switchport access vlan 999
+S1(config-if-range)#shutdown
+```
+Коммутатор S2
+```
+S2(config)#int range f0/2-4,f0/6-17,f0/19-24,g0/1-2
+S2(config-if-range)#switchport mode access
+S2(config-if-range)#switchport access vlan 999
+S2(config-if-range)#shutdown
+```
 #### Шаг 2. Назначьте сети VLAN соответствующим интерфейсам коммутатора.
 a.	Назначьте используемые порты соответствующей VLAN (указанной в таблице VLAN выше) и настройте их для режима статического доступа.
+
+Коммутатор S1
+```
+S1(config)#int f0/6
+S1(config-if)#switchport mode access
+S1(config-if)#switchport access vlan 30
+```
+Коммутатор S2
+```
+S2(config)#int f0/5
+S2(config-if)#switchport mode access
+S2(config-if)#switchport access vlan 20
+S2(config-if)#exit
+S2(config)#int f0/18
+S2(config-if)#switchport mode access
+S2(config-if)#switchport access vlan 40
+```
 b.	Выполните команду show vlan brief, чтобы убедиться, что сети VLAN назначены правильным интерфейсам.
-Закройте окно настройки.
-#### Часть 3. •Настройте транки (магистральные каналы).
+
+Коммутатор S1
+```
+S1#show vlan brief
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/1, Fa0/5
+20   Management                       active    
+30   Operations                       active    Fa0/6
+40   Sales                            active    
+999  ParkingLot                       active    Fa0/2, Fa0/3, Fa0/4, Fa0/7
+                                                Fa0/8, Fa0/9, Fa0/10, Fa0/11
+                                                Fa0/12, Fa0/13, Fa0/14, Fa0/15
+                                                Fa0/16, Fa0/17, Fa0/18, Fa0/19
+                                                Fa0/20, Fa0/21, Fa0/22, Fa0/23
+                                                Fa0/24, Gig0/1, Gig0/2
+1000 native                           active    
+1002 fddi-default                     active    
+1003 token-ring-default               active    
+1004 fddinet-default                  active    
+1005 trnet-default                    active
+```
+Коммутатор S2
+```
+S2#show vlan brief
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/1
+20   Management                       active    Fa0/5
+30   Operations                       active    
+40   Sales                            active    Fa0/18
+999  ParkingLot                       active    Fa0/2, Fa0/3, Fa0/4, Fa0/6
+                                                Fa0/7, Fa0/8, Fa0/9, Fa0/10
+                                                Fa0/11, Fa0/12, Fa0/13, Fa0/14
+                                                Fa0/15, Fa0/16, Fa0/17, Fa0/19
+                                                Fa0/20, Fa0/21, Fa0/22, Fa0/23
+                                                Fa0/24, Gig0/1, Gig0/2
+1000 native                           active    
+1002 fddi-default                     active    
+1003 token-ring-default               active    
+1004 fddinet-default                  active    
+1005 trnet-default                    active    
+```
+#### Часть 3. Настройте транки (магистральные каналы).
 #### Шаг 1. Вручную настройте магистральный интерфейс F0/1.
 Откройте окно конфигурации
 a.	Измените режим порта коммутатора на интерфейсе F0/1, чтобы принудительно создать магистральную связь. Не забудьте сделать это на обоих коммутаторах.
