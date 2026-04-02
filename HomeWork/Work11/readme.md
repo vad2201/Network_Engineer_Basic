@@ -484,7 +484,13 @@ Loopback1              172.16.1.1      YES manual up                    up
 Vlan1                  unassigned      YES NVRAM  administratively down down
 ```
 #### Шаг 2. Настройка интерфейса R2 g0/0/1 с использованием адреса из таблицы и маршрута по умолчанию с адресом следующего перехода 10.20.0.1
-Закройте окно настройки.
+```
+R2#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+R2(config)#int g0/0/1
+R2(config-if)#ip address 10.20.0.4 255.255.255.0
+R2(config-if)#ip default-gateway 10.20.0.1
+```
 #### Часть 5. Настройте удаленный доступ
 #### Шаг 1. Настройте все сетевые устройства для базовой поддержки SSH.
 Откройте окно конфигурации
