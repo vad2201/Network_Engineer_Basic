@@ -493,11 +493,95 @@ R2(config-if)#ip default-gateway 10.20.0.1
 ```
 #### Часть 5. Настройте удаленный доступ
 #### Шаг 1. Настройте все сетевые устройства для базовой поддержки SSH.
-Откройте окно конфигурации
+
 a.	Создайте локального пользователя с именем пользователя SSHadmin и зашифрованным паролем $cisco123!
+
 b.	Используйте ccna-lab.com в качестве доменного имени.
+
 c.	Генерируйте криптоключи с помощью 1024 битного модуля.
+
 d.	Настройте первые пять линий VTY на каждом устройстве, чтобы поддерживать только SSH-соединения и с локальной аутентификацией.
+
+Маршрутизатор R1
+```
+R1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+R1(config)#ip domain-name ccna-lab.com
+R1(config)#crypto key generate rsa
+The name for the keys will be: R1.ccna-lab.com
+Choose the size of the key modulus in the range of 360 to 2048 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 1024
+% Generating 1024 bit RSA keys, keys will be non-exportable...[OK]
+
+R1(config)#ip ssh version 2
+*Mar 1 1:10:58.984: %SSH-5-ENABLED: SSH 1.99 has been enabled
+R1(config)#username SSHadmin privilege 15 secret $cisco123!
+R1(config)#line vty 0 4
+R1(config-line)#transport input ssh
+R1(config-line)#login local
+R1(config-line)#
+```
+Маршрутизатор R2
+```
+R2(config)#ip domain-name ccna-lab.com
+R2(config)#crypto key generate RSA
+The name for the keys will be: R2.ccna-lab.com
+Choose the size of the key modulus in the range of 360 to 2048 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 1024
+% Generating 1024 bit RSA keys, keys will be non-exportable...[OK]
+
+R2(config)#ip ssh version 2
+*Mar 1 1:26:9.76: %SSH-5-ENABLED: SSH 1.99 has been enabled
+R2(config)#username SSHadmin privilege 15 secret $cisco123!
+R2(config)#line vty 0 4
+R2(config-line)#transport input ssh
+R2(config-line)#login local
+R2(config-line)#
+```
+Коммутатор S1
+```
+S1(config)#ip domain-name ccna-lab.com
+S1(config)#crypto key generate RSA
+The name for the keys will be: S1.ccna-lab.com
+Choose the size of the key modulus in the range of 360 to 2048 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 1024
+% Generating 1024 bit RSA keys, keys will be non-exportable...[OK]
+
+S1(config)#ip ssh version 2
+*Mar 1 1:27:51.878: %SSH-5-ENABLED: SSH 1.99 has been enabled
+S1(config)#username SSHadmin privilege 15 secret $cisco123!
+S1(config)#line vty 0 4
+S1(config-line)#transport input ssh
+S1(config-line)#login local
+```
+Коммутатор S2
+```
+S2(config)#ip domain-name ccna-lab.com
+S2(config)#crypto key generate RSA
+The name for the keys will be: S2.ccna-lab.com
+Choose the size of the key modulus in the range of 360 to 2048 for your
+  General Purpose Keys. Choosing a key modulus greater than 512 may take
+  a few minutes.
+
+How many bits in the modulus [512]: 1024
+% Generating 1024 bit RSA keys, keys will be non-exportable...[OK]
+
+S2(config)#ip ssh version 2
+*Mar 1 1:29:23.497: %SSH-5-ENABLED: SSH 1.99 has been enabled
+S2(config)#username SSHadmin privilege 15 secret $cisco123!
+S2(config)#line vty 0 4
+S2(config-line)#transport input ssh
+S2(config-line)#login local
+```
 #### Шаг 2. Включите защищенные веб-службы с проверкой подлинности на R1.
 a.	Включите сервер HTTPS на R1.
 R1(config)# ip http secure-server 
