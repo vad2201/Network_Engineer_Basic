@@ -489,6 +489,7 @@ R2#conf t
 Enter configuration commands, one per line.  End with CNTL/Z.
 R2(config)#int g0/0/1
 R2(config-if)#ip address 10.20.0.4 255.255.255.0
+R2(config-if)#no shutdown
 R2(config-if)#ip default-gateway 10.20.0.1
 ```
 #### Часть 5. Настройте удаленный доступ
