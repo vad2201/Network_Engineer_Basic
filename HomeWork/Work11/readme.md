@@ -632,9 +632,13 @@ R1(config-if)#ip address 10.50.0.1 255.255.255.0
 <img width="666" height="282" alt="image" src="https://github.com/user-attachments/assets/4dd7700d-2fcd-480d-a80a-d7c5a3feffc8" />
 
 #### Шаг 2. Выполните следующие тесты. Эхозапрос должен пройти успешно.
+
 Примечание. Возможно, вам придется отключить брандмауэр ПК для работы ping
+
 От	Протокол	Назначение
+
 PC-A	Ping	10.40.0.10
+
 ```
 C:\>ping 10.40.0.10
 Pinging 10.40.0.10 with 32 bytes of data:
@@ -695,25 +699,48 @@ Ping statistics for 172.16.1.1:
 ```
 
 PC-B	HTTPS	10.20.0.1
+
 <img width="675" height="147" alt="image" src="https://github.com/user-attachments/assets/ff72a944-96ed-4fa2-8ef6-e9d9409a1551" />
 
 PC-B	HTTPS	172.16.1.1
+
 <img width="675" height="151" alt="image" src="https://github.com/user-attachments/assets/391b1de5-b68d-4f34-afcf-6589b09272bc" />
 
 Доступ по HTTPS не доступен , так как мы не смогли включить HTTP на R1.
+
 Проверим HTTPS через сервер, который мы подлючили к R1.
+
 <img width="671" height="314" alt="image" src="https://github.com/user-attachments/assets/6bafe6ca-c9f2-481f-917b-0abe29071a09" />
+
 HTTP работает.
 
 PC-B	SSH	10.20.0.1
 ```
+C:\>ssh -l SSHadmin 10.20.0.1
 
+Password: 
+
+
+Prohibiting unauthorized access to the device!!!! 
+
+R1#
 ```
+
+Подключение работает.
 
 PC-B	SSH	172.16.1.1
 ```
+C:\>ssh -l SSHadmin 172.16.1.1
 
+Password: 
+
+
+Prohibiting unauthorized access to the device!!!! 
+
+R1#
 ```
+
+Подключение работает.
 
 #### Часть 7. Настройка и проверка списков контроля доступа (ACL)
 При проверке базового подключения компания требует реализации следующих политик безопасности:
