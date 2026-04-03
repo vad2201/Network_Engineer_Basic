@@ -584,26 +584,137 @@ S2(config-line)#transport input ssh
 S2(config-line)#login local
 ```
 #### Шаг 2. Включите защищенные веб-службы с проверкой подлинности на R1.
+
 a.	Включите сервер HTTPS на R1.
+
 R1(config)# ip http secure-server 
+
 b.	Настройте R1 для проверки подлинности пользователей, пытающихся подключиться к веб-серверу.
+
 R1(config)# ip http authentication local
-Закройте окно настройки.
+
+```
+R1(config)#ip http secure-server
+               ^
+% Invalid input detected at '^' marker.
+	
+R1(config)# ip http authentication local
+                ^
+% Invalid input detected at '^' marker.
+```
+Команды http в CPT не поддерживаются.
+Для проверки HTTP подключим к R1 сервер и соединим его через интерфейс g0/0/0
+<img width="218" height="221" alt="image" src="https://github.com/user-attachments/assets/2638d855-58b9-4875-9841-4616cda04719" />
+
+Настроим g0/0/0.
+
+```
+R1(config)#int g0/0/0
+R1(config-if)#no shutdown
+R1(config-if)#ip address 10.50.0.1 255.255.255.0
+```
+
+Настроим сервер.
+
+<img width="666" height="249" alt="image" src="https://github.com/user-attachments/assets/ae3b5c58-6c7e-43b5-8fd1-98c99ff89419" />
+
+Включим на нем HTTPS.
+
+<img width="658" height="214" alt="image" src="https://github.com/user-attachments/assets/0f35e1e3-7f28-420b-87ac-f9e511fa8e83" />
+
 #### Часть 6. Проверка подключения
 #### Шаг 1. Настройте узлы ПК.
-Адреса ПК можно посмотреть в таблице адресации.
+
+Компьютер PC-A
+<img width="664" height="272" alt="image" src="https://github.com/user-attachments/assets/f8187bf5-1140-469f-b38b-64aaab8c8d5d" />
+
+Компьютер PC-B
+<img width="666" height="282" alt="image" src="https://github.com/user-attachments/assets/4dd7700d-2fcd-480d-a80a-d7c5a3feffc8" />
+
 #### Шаг 2. Выполните следующие тесты. Эхозапрос должен пройти успешно.
 Примечание. Возможно, вам придется отключить брандмауэр ПК для работы ping
 От	Протокол	Назначение
 PC-A	Ping	10.40.0.10
+```
+C:\>ping 10.40.0.10
+Pinging 10.40.0.10 with 32 bytes of data:
+Request timed out.
+Reply from 10.40.0.10: bytes=32 time=1ms TTL=127
+Reply from 10.40.0.10: bytes=32 time=1ms TTL=127
+Reply from 10.40.0.10: bytes=32 time=1ms TTL=127
+Ping statistics for 10.40.0.10:
+    Packets: Sent = 4, Received = 3, Lost = 1 (25% loss)
+```
+    
 PC-A	Ping	10.20.0.1
+```
+C:\>ping 10.20.0.1
+Pinging 10.20.0.1 with 32 bytes of data:
+Reply from 10.20.0.1: bytes=32 time<1ms TTL=255
+Reply from 10.20.0.1: bytes=32 time<1ms TTL=255
+Reply from 10.20.0.1: bytes=32 time<1ms TTL=255
+Reply from 10.20.0.1: bytes=32 time=1ms TTL=255
+Ping statistics for 10.20.0.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)
+```
+
 PC-B	Ping	10.30.0.10
+```
+C:\>ping 10.30.0.10
+Pinging 10.30.0.10 with 32 bytes of data:
+Reply from 10.30.0.10: bytes=32 time=1ms TTL=127
+Reply from 10.30.0.10: bytes=32 time=1ms TTL=127
+Reply from 10.30.0.10: bytes=32 time=1ms TTL=127
+Reply from 10.30.0.10: bytes=32 time<1ms TTL=127
+Ping statistics for 10.30.0.10:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)
+```
+
 PC-B	Ping	10.20.0.1
+```
+C:\>ping 10.20.0.1
+Pinging 10.20.0.1 with 32 bytes of data:
+Reply from 10.20.0.1: bytes=32 time<1ms TTL=255
+Reply from 10.20.0.1: bytes=32 time<1ms TTL=255
+Reply from 10.20.0.1: bytes=32 time<1ms TTL=255
+Reply from 10.20.0.1: bytes=32 time=1ms TTL=255
+Ping statistics for 10.20.0.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)
+```
+
 PC-B	Ping	172.16.1.1
+```
+C:\>ping 172.16.1.1
+Pinging 172.16.1.1 with 32 bytes of data:
+Reply from 172.16.1.1: bytes=32 time<1ms TTL=255
+Reply from 172.16.1.1: bytes=32 time<1ms TTL=255
+Reply from 172.16.1.1: bytes=32 time<1ms TTL=255
+Reply from 172.16.1.1: bytes=32 time=1ms TTL=255
+Ping statistics for 172.16.1.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)
+```
+
 PC-B	HTTPS	10.20.0.1
+<img width="675" height="147" alt="image" src="https://github.com/user-attachments/assets/ff72a944-96ed-4fa2-8ef6-e9d9409a1551" />
+
 PC-B	HTTPS	172.16.1.1
+<img width="675" height="151" alt="image" src="https://github.com/user-attachments/assets/391b1de5-b68d-4f34-afcf-6589b09272bc" />
+
+Доступ по HTTPS не доступен , так как мы не смогли включить HTTP на R1.
+Проверим HTTPS через сервер, который мы подлючили к R1.
+<img width="671" height="314" alt="image" src="https://github.com/user-attachments/assets/6bafe6ca-c9f2-481f-917b-0abe29071a09" />
+HTTP работает.
+
 PC-B	SSH	10.20.0.1
+```
+
+```
+
 PC-B	SSH	172.16.1.1
+```
+
+```
+
 #### Часть 7. Настройка и проверка списков контроля доступа (ACL)
 При проверке базового подключения компания требует реализации следующих политик безопасности:
 Политика1. Сеть Sales не может использовать SSH в сети Management (но в  другие сети SSH разрешен). 
