@@ -802,13 +802,93 @@ R1(config-subif)#ip access-group OperationsICMP in
 Выполните следующие тесты. Ожидаемые результаты показаны в таблице:
 От	Протокол	Назначение	Результат
 PC-A	Ping	10.40.0.10	Сбой
+```
+C:\>Ping 10.40.0.10
+
+Pinging 10.40.0.10 with 32 bytes of data:
+
+Reply from 10.30.0.1: Destination host unreachable.
+Reply from 10.30.0.1: Destination host unreachable.
+Reply from 10.30.0.1: Destination host unreachable.
+Reply from 10.30.0.1: Destination host unreachable.
+
+Ping statistics for 10.40.0.10:
+    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss)
+```
 PC-A	Ping	10.20.0.1	Успех
+```
+Pinging 10.20.0.1 with 32 bytes of data:
+
+Reply from 10.20.0.1: bytes=32 time<1ms TTL=255
+Reply from 10.20.0.1: bytes=32 time=1ms TTL=255
+Reply from 10.20.0.1: bytes=32 time=1ms TTL=255
+Reply from 10.20.0.1: bytes=32 time<1ms TTL=255
+
+Ping statistics for 10.20.0.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)
+```
 PC-B	Ping	10.30.0.10	Сбой
+```
+C:\>Ping 10.30.0.10
+
+Pinging 10.30.0.10 with 32 bytes of data:
+
+Reply from 10.40.0.1: Destination host unreachable.
+Reply from 10.40.0.1: Destination host unreachable.
+Reply from 10.40.0.1: Destination host unreachable.
+Reply from 10.40.0.1: Destination host unreachable.
+
+Ping statistics for 10.30.0.10:
+    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss)
+```
 PC-B	Ping	10.20.0.1	Сбой
+```
+C:\>Ping 10.20.0.1
+
+Pinging 10.20.0.1 with 32 bytes of data:
+
+Reply from 10.40.0.1: Destination host unreachable.
+Reply from 10.40.0.1: Destination host unreachable.
+Reply from 10.40.0.1: Destination host unreachable.
+Reply from 10.40.0.1: Destination host unreachable.
+
+Ping statistics for 10.20.0.1:
+    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss)
+```
 PC-B	Ping	172.16.1.1	Успех
+```
+C:\>Ping 172.16.1.1
+
+Pinging 172.16.1.1 with 32 bytes of data:
+
+Reply from 172.16.1.1: bytes=32 time<1ms TTL=255
+Reply from 172.16.1.1: bytes=32 time<1ms TTL=255
+Reply from 172.16.1.1: bytes=32 time=1ms TTL=255
+Reply from 172.16.1.1: bytes=32 time=1ms TTL=255
+
+Ping statistics for 172.16.1.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)
+```
 PC-B	HTTPS	10.20.0.1	Сбой
 PC-B	HTTPS	172.16.1.1	Успех
+Так как мы не смогли поднять HTTP на R1, проверим через подключенный сервер:
+<img width="676" height="149" alt="image" src="https://github.com/user-attachments/assets/ede6b45c-a4f3-4028-9d2c-3599216117e0" />
+Из PC-A работает
+<img width="675" height="309" alt="image" src="https://github.com/user-attachments/assets/a0cce3f3-d4dc-4e77-9976-3cadd4558b62" />
+
 PC-B	SSH	10.20.0.4	Сбой
+```
+C:\>ssh -l SSHadmin 10.20.0.4
+
+% Connection timed out; remote host not responding
+```
 PC-B	SSH	172.16.1.1	Успех
+```
+C:\>ssh -l SSHadmin 172.16.1.1
+Password: 
+
+Prohibiting unauthorized access to the device!!!! 
+R1#
+```
 
 
