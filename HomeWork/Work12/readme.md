@@ -39,35 +39,207 @@
 #### Часть 1. Создание сети и настройка основных параметров устройства
 В первой части лабораторной работы вам предстоит создать топологию сети и настроить базовые параметры для узлов ПК и коммутаторов.
 #### Шаг 1. Подключите кабели сети согласно приведенной топологии.
-Подключите устройства в соответствии с топологией и подсоедините соответствующие кабели.
+<img width="570" height="261" alt="image" src="https://github.com/user-attachments/assets/d0e9d7c1-f58e-45ac-9cd7-aba1b26721fb" />
 
 #### Шаг 2. Произведите базовую настройку маршрутизаторов.
-Откройте окно конфигурации
+Перед настройкой маршрутизаторов проведем их инициализацию:
+```
+enable
+erase startup-config 
+delete flash:vlan.dat
+reload
+```
+Процедура выполняется на каждом устройстве.
+
 a.	Назначьте маршрутизатору имя устройства.
+
 b.	Отключите поиск DNS, чтобы предотвратить попытки маршрутизатора неверно преобразовывать введенные команды таким образом, как будто они являются именами узлов.
+
 c.	Назначьте class в качестве зашифрованного пароля привилегированного режима EXEC.
+
 d.	Назначьте cisco в качестве пароля консоли и включите вход в систему по паролю.
+
 e.	Назначьте cisco в качестве пароля VTY и включите вход в систему по паролю.
+
 f.	Зашифруйте открытые пароли.
+
 g.	Создайте баннер с предупреждением о запрете несанкционированного доступа к устройству.
+
 h.	Настройте IP-адресации интерфейса, как указано в таблице выше.
+
 i.	Настройте маршрут по умолчанию. от R2 до  R1.
+
 j.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
-Закройте окно настройки.
+
+Маршрутизатор R1
+```
+Router>enable
+Router#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#hostname R1 
+R1(config)#no ip domain-lookup
+R1(config)#enable secret class
+R1(config)#line con 0
+R1(config-line)#password cisco
+R1(config-line)#login
+R1(config-line)#exit
+R1(config)#line vty 0 15
+R1(config-line)#password cisco
+R1(config-line)#login
+R1(config-line)#exit
+R1(config)#service password-encryption 
+R1(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+R1(config)#int g0/0/0
+R1(config-if)#ip address 209.165.200.230 255.255.255.248
+R1(config-if)#no shutdown
+R1(config-if)#exit
+R1(config)#int g0/0/1
+R1(config-if)#ip address 192.168.1.1 255.255.255.0
+R1(config-if)#no shutdown
+R1(config-if)#exit
+R1#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+R1#
+```
+Маршрутизатор R2
+```
+Router>
+Router>enable
+Router#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#hostname R2 
+R2(config)#no ip domain-lookup
+R2(config)#enable secret class
+R2(config)#line con 0
+R2(config-line)#password cisco
+R2(config-line)#login
+R2(config-line)#exit
+R2(config)#line vty 0 15
+R2(config-line)#password cisco
+R2(config-line)#login
+R2(config-line)#exit
+R2(config)#service password-encryption 
+R2(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+R2(config)#int g0/0/0
+R2(config-if)#ip address 209.165.200.225 255.255.255.248
+R2(config-if)#exit
+R2(config)#int loopback 1
+R2(config-if)#
+R2(config-if)#ip address 209.165.200.1 255.255.255.224
+R2(config-if)#no shutdown
+R2(config-if)#exit
+R2(config)#Ip route 0.0.0.0 0.0.0.0 209.165.200.230
+R2(config)#exit
+R2#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+R2#
+```
 
 #### Шаг 3. Настройте базовые параметры каждого коммутатора.
-Откройте окно конфигурации
+Перед настройкой коммутаторов проведем их инициализацию:
+```
+enable
+erase startup-config
+delete flash:vlan.dat 
+reload
+```
+Процедура выполняется на каждом устройстве.
+
 a.	Присвойте коммутатору имя устройства.
+
 b.	Отключите поиск DNS, чтобы предотвратить попытки маршрутизатора неверно преобразовывать введенные команды таким образом, как будто они являются именами узлов.
+
 c.	Назначьте class в качестве зашифрованного пароля привилегированного режима EXEC.
+
 d.	Назначьте cisco в качестве пароля консоли и включите вход в систему по паролю.
+
 e.	Назначьте cisco в качестве пароля VTY и включите вход в систему по паролю.
+
 f.	Зашифруйте открытые пароли.
+
 g.	Создайте баннер с предупреждением о запрете несанкционированного доступа к устройству.
+
 h.	Выключите все интерфейсы, которые не будут использоваться.
+
 i.	Настройте IP-адресации интерфейса, как указано в таблице выше.
+
 j.	Сохраните текущую конфигурацию в файл загрузочной конфигурации.
-Закройте окно настройки.
+
+Коммутатор S1
+```
+Switch>enable
+Switch#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname S1 
+S1(config)#no ip domain-lookup
+S1(config)#enable secret class
+S1(config)#line con 0
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#line vty 0 15
+S1(config-line)#password cisco
+S1(config-line)#login
+S1(config-line)#exit
+S1(config)#service password-encryption 
+S1(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+S1(config)#int range f0/2-4,f0/7-24,g0/1-2
+S1(config-if-range)#shutdown
+S1(config)#vlan 1
+S1(config-vlan)#
+S1(config-vlan)#exit
+S1(config)#int vlan 1
+S1(config-if)#ip address 192.168.1.11 255.255.255.0
+S1#copy running-config startup-config 
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+S1#
+```
+Коммутатор S2
+```
+Switch>enable
+Switch#configure terminal 
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#hostname S2 
+S2(config)#no ip domain-lookup
+S2(config)#enable secret class
+S2(config)#line con 0
+S2(config-line)#password cisco
+S2(config-line)#login
+S2(config-line)#exit
+S2(config)#line vty 0 15
+S2(config-line)#password cisco
+S2(config-line)#login
+S2(config-line)#exit
+S2(config)#service password-encryption 
+S2(config)#banner motd #
+Enter TEXT message.  End with the character '#'.
+Prohibiting unauthorized access to the device!!!! #
+S2(config)#int range f0/2-17,f0/19-24,g0/1-2
+S2(config-if-range)#shutdown
+S2(config-if-range)#exit
+S2(config)#vlan 1
+S2(config-vlan)#exit
+S2(config)#int vlan 1
+S2(config-if)#ip address 192.168.1.12 255.255.255.0
+S2(config-if)#end
+S2#copy running-config startup-config
+Destination filename [startup-config]? 
+Building configuration...
+[OK]
+S2#
+```
 #### Часть 2. Настройка и проверка NAT для IPv4.
 В части 2 необходимо настроить и проверить NAT для IPv4.
 #### Шаг 1. Настройте NAT на R1, используя пул из трех адресов 209.165.200.226-209.165.200.228. 
