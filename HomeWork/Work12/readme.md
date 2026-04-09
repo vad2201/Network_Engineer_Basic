@@ -88,6 +88,7 @@ R1(config)#int g0/0/1
 R1(config-if)#ip address 192.168.1.1 255.255.255.0
 R1(config-if)#no shutdown
 R1(config-if)#exit
+R1(config)#Ip route 0.0.0.0 0.0.0.0 209.165.200.225
 R1#copy running-config startup-config 
 Destination filename [startup-config]? 
 Building configuration...
@@ -261,48 +262,99 @@ R1(config)# interface g0/0/0
 R1(config-if)# ip nat outside
 ```
 #### Шаг 2. Проверьте и проверьте конфигурацию. 
-a.	С PC-B,  запустите эхо-запрос интерфейса Lo1 (209.165.200.1) на R2. Если эхо-запрос не прошел, выполните процес поиска и устранения неполадок. На R1 отобразите таблицу NAT на R1 с помощью команды show ip nat translations.
-R1# show ip nat translations
-Pro Inside global Inside local Outside local Outside global
---- 209.165.200.226 192.168.1.3 --- --- 
-226:1 192.168.1. 3:1 209.165.200. 1:1 209.165.200. 1:1 
-Total number of translations: 2
-Вопросы:
+a.	С PC-B,  запустите эхо-запрос интерфейса Lo1 (209.165.200.1) на R2. 
+```
+C:\>ping 209.165.200.1
+Pinging 209.165.200.1 with 32 bytes of data:
+Reply from 209.165.200.1: bytes=32 time<1ms TTL=254
+Reply from 209.165.200.1: bytes=32 time<1ms TTL=254
+Reply from 209.165.200.1: bytes=32 time<1ms TTL=254
+Reply from 209.165.200.1: bytes=32 time=1ms TTL=254
+Ping statistics for 209.165.200.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)
+```    
+На R1 отобразите таблицу NAT на R1 с помощью команды show ip nat translations.
+```
+R1#show ip nat translations
+Pro  Inside global     Inside local       Outside local      Outside global
+icmp 209.165.200.226:5 192.168.1.3:5      209.165.200.1:5    209.165.200.1:5
+icmp 209.165.200.226:6 192.168.1.3:6      209.165.200.1:6    209.165.200.1:6
+icmp 209.165.200.226:7 192.168.1.3:7      209.165.200.1:7    209.165.200.1:7
+icmp 209.165.200.226:8 192.168.1.3:8      209.165.200.1:8    209.165.200.1:8
+```
+#### Вопросы:
 Во что был транслирован внутренний локальный адрес PC-B?
-Введите ваш ответ здесь.
- 
+
+Он был переведен в адрес 209.165.200.226 с разными портами. 
+
 Какой тип адреса NAT является переведенным адресом?
- 
-b.	С PC-A, запустите  эхо-запрос интерфейса Lo1 (209.165.200.1) на R2. Если эхо-запрос не прошел, выполните отладку. На R1 отобразите таблицу NAT на R1 с помощью команды show ip nat translations.
-R1# show ip nat translations 
-Pro Inside global Inside local Outside local Outside global
---- 209.165.200.227 192.168.1.2 --- ---
---- 209.165.200.226 192.168.1.3 --- ---
-227:1 192.168.1. 2:1 209.165.200. 1:1 209.165.200. 1:1
-226:1 192.168.1. 3:1 209.165.200. 1:1 209.165.200. 1:1
-Total number of translations: 4
-c.	Обратите внимание, что предыдущая трансляция для PC-B все еще находится в таблице. Из S1, эхо-запрос интерфейса Lo1 (209.165.200.1) на R2. Если эхо-запрос не прошел, выполните отладку. На R1 отобразите таблицу NAT на R1 с помощью команды show ip nat translations.
-R1# show ip nat translations
-Pro Inside global Inside local Outside local Outside global
---- 209.165.200.227 192.168.1.2 --- ---
---- 209.165.200.226 192.168.1.3 --- ---
---- 209.165.200.228 192.168.1.11 --- ---
-226:1 192.168.1. 3:1 209.165.200. 1:1 209.165.200. 1:1
-228:0 192.168.1. 11:0 209.165.200. 1:0 209.165.200. 1:0 209.165.200. 1:0
-Total number of translations: 5
+
+Iside global является переведенным адресом в NAT.
+
+b.	С PC-A, запустите  эхо-запрос интерфейса Lo1 (209.165.200.1) на R2. 
+```
+C:\>ping 209.165.200.1
+Pinging 209.165.200.1 with 32 bytes of data:
+Reply from 209.165.200.1: bytes=32 time<1ms TTL=254
+Reply from 209.165.200.1: bytes=32 time=1ms TTL=254
+Reply from 209.165.200.1: bytes=32 time=1ms TTL=254
+Reply from 209.165.200.1: bytes=32 time=1ms TTL=254
+Ping statistics for 209.165.200.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)
+```    
+
+На R1 отобразите таблицу NAT на R1 с помощью команды show ip nat translations.
+```
+R1#show ip nat translations
+Pro  Inside global     Inside local       Outside local      Outside global
+icmp 209.165.200.226:10 192.168.1.2:10     209.165.200.1:10   209.165.200.1:10
+icmp 209.165.200.226:11 192.168.1.2:11     209.165.200.1:11   209.165.200.1:11
+icmp 209.165.200.226:12 192.168.1.2:12     209.165.200.1:12   209.165.200.1:12
+icmp 209.165.200.226:9 192.168.1.2:9      209.165.200.1:9    209.165.200.1:9
+```
+
+c.	Из S1, эхо-запрос интерфейса Lo1 (209.165.200.1) на R2. 
+```
+S1#ping 209.165.200.1
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 209.165.200.1, timeout is 2 seconds:
+.!!!!
+Success rate is 80 percent (4/5), round-trip min/avg/max = 0/0/0 ms
+```
+
+На R1 отобразите таблицу NAT на R1 с помощью команды show ip nat translations.
+```
+R1#show ip nat translations
+Pro  Inside global     Inside local       Outside local      Outside global
+icmp 209.165.200.226:2 192.168.1.11:2     209.165.200.1:2    209.165.200.1:2
+icmp 209.165.200.226:3 192.168.1.11:3     209.165.200.1:3    209.165.200.1:3
+icmp 209.165.200.226:4 192.168.1.11:4     209.165.200.1:4    209.165.200.1:4
+icmp 209.165.200.226:5 192.168.1.11:5     209.165.200.1:5    209.165.200.1:5
+```
+
 d.	Теперь запускаем пинг R2 Lo1 из S2. На этот раз перевод завершается неудачей, и вы получаете эти сообщения (или аналогичные) на консоли R1:
 Sep 23 15:43:55.562: %IOSXE-6-PLATFORM: R0/0: cpp_cp: QFP:0.0 Thread:000 TS:00000001473688385900 %NAT-6-ADDR_ALLOC_FAILURE: Address allocation failed; pool 1 may be exhausted [2]
+```
+S2#ping 209.165.200.1
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 209.165.200.1, timeout is 2 seconds:
+.!!!!
+Success rate is 80 percent (4/5), round-trip min/avg/max = 1/1/1 ms
+```
 e.	Это ожидаемый результат, потому что выделено только 3 адреса, и мы попытались ping Lo1 с четырех устройств. Напомним, что NAT — это трансляция «один-в-один». Как много выделено трансляций? Введите команду show ip nat translations verbose , и вы увидите, что ответ будет 24 часа.
-R1# show ip nat translations verbose 
-Pro Inside global Inside local Outside local Outside global
---- 209.165.200.226 192.168.1.3 --- ---
-  create: 09/23/19 15:35:27, use: 09/23/19 15:35:27, timeout: 23:56:42
-  Map-Id(In): 1
-<output omitted>
+На CPT команда show ip nat translations verbose не поддерживается.
+```
+R1#show ip nat translations verbose 
+                            ^
+% Invalid input detected at '^' marker.
+```
 f.	Учитывая, что пул ограничен тремя адресами, NAT для пула адресов недостаточно для нашего приложения. Очистите преобразование NAT и статистику, и мы перейдем к PAT.
+
 R1# clear ip nat translations * 
 R1# clear ip nat statistics 
-Закройте окно настройки.
+
 #### Часть 3. Настройка и проверка PAT для IPv4.
 В части 3 необходимо настроить замену NAT на PAT в пул адресов, а затем на PAT с помощью интерфейса.
 #### Шаг 1. Удалите команду преобразования на R1.
@@ -400,16 +452,5 @@ Pro Inside global Inside local Outside local Outside global
 229:3 192.168.1. 2:3 209.165.200. 225:3 209.165.200. 225:3 209.165.200. 
 Total number of translations: 2
 Это подтверждает, что статический NAT работает.
-Закройте окно настройки.
-Сводная таблица по интерфейсам маршрутизаторов
-Модель маршрутизатора	Интерфейс Ethernet № 1	Интерфейс Ethernet № 2	Последовательный интерфейс № 1	Последовательный интерфейс № 2
-1 800	Fast Ethernet 0/0 (F0/0)	Fast Ethernet 0/1 (F0/1)	Serial 0/0/0 (S0/0/0)	Serial 0/0/1 (S0/0/1)
-1900	Gigabit Ethernet 0/0 (G0/0)	Gigabit Ethernet 0/1 (G0/1)	Serial 0/0/0 (S0/0/0)	Serial 0/0/1 (S0/0/1)
-2801	Fast Ethernet 0/0 (F0/0)	Fast Ethernet 0/1 (F0/1)	Serial 0/1/0 (S0/1/0)	Serial 0/1/1 (S0/1/1)
-2811	Fast Ethernet 0/0 (F0/0)	Fast Ethernet 0/1 (F0/1)	Serial 0/0/0 (S0/0/0)	Serial 0/0/1 (S0/0/1)
-2900	Gigabit Ethernet 0/0 (G0/0)	Gigabit Ethernet 0/1 (G0/1)	Serial 0/0/0 (S0/0/0)	Serial 0/0/1 (S0/0/1)
-4221	Gigabit Ethernet 0/0/0 (G0/0/0)	Gigabit Ethernet 0/0/1 (G0/0/1)	Serial 0/1/0 (S0/1/0)	Serial 0/1/1 (S0/1/1)
-4300	Gigabit Ethernet 0/0/0 (G0/0/0)	Gigabit Ethernet 0/0/1 (G0/0/1)	Serial 0/1/0 (S0/1/0)	Serial 0/1/1 (S0/1/1)
-Примечание. Чтобы определить конфигурацию маршрутизатора, можно посмотреть на интерфейсы и установить тип маршрутизатора и количество его интерфейсов. Перечислить все комбинации конфигураций для каждого класса маршрутизаторов невозможно. Эта таблица содержит идентификаторы для возможных комбинаций интерфейсов Ethernet и последовательных интерфейсов на устройстве. Другие типы интерфейсов в таблице не представлены, хотя они могут присутствовать в данном конкретном маршрутизаторе. В качестве примера можно привести интерфейс ISDN BRI. Строка в скобках — это официальное сокращение, которое можно использовать в командах Cisco IOS для обозначения интерфейса.
-Конец документа
+
 
