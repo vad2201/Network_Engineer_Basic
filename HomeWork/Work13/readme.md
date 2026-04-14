@@ -183,35 +183,52 @@ Building configuration...
 ```
 #### Часть 2. Обнаружение сетевых ресурсов с помощью протокола CDP
 На устройствах Cisco протокол CDP включен по умолчанию. Воспользуйтесь CDP, чтобы обнаружить порты, к которым подключены кабели.
-Откройте окно конфигурации
+
 a.	На R1 используйте соответствующую команду show cdp, чтобы определить, сколько интерфейсов включено CDP, сколько из них включено и сколько отключено.
- 
+```
+R1#show cdp int
+Vlan1 is administratively down, line protocol is down
+  Sending CDP packets every 60 seconds
+  Holdtime is 180 seconds
+GigabitEthernet0/0/0 is administratively down, line protocol is down
+  Sending CDP packets every 60 seconds
+  Holdtime is 180 seconds
+GigabitEthernet0/0/1 is up, line protocol is up
+  Sending CDP packets every 60 seconds
+  Holdtime is 180 seconds
+```
 Вопрос:
+
 Сколько интерфейсов участвует в объявлениях CDP? Какие из них активны?
-Введите ваш ответ здесь.
+
+Vlan1, GigabitEthernet0/0/0, GigabitEthernet0/0/1 учавствуют в объявлениях cdp. Только GigabitEthernet0/0/1 активен.
+
  
 b.	На R1 используйте соответствующую команду show cdp, чтобы определить версию IOS, используемую на S1.
-R1# show cdp entry  S1
--------------------------
+```
+R1#show cdp entry  S1
+
 Device ID: S1
-Entry address(es):
-Platform: cisco WS-C2960+24LC-L, Capabilities: Switch IGMP 
+Entry address(es): 
+  IP address : 10.22.0.2
+Platform: cisco 2960, Capabilities: Switch
 Interface: GigabitEthernet0/0/1, Port ID (outgoing port): FastEthernet0/5
-Holdtime : 125 sec
+Holdtime: 168
 
 Version :
-Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 15.2(4)E8, RELEASE SOFTWARE (fc3) 
+Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 15.0(2)SE4, RELEASE SOFTWARE (fc1)
 Technical Support: http://www.cisco.com/techsupport
-Copyright (c) 1986-2019 by Cisco Systems, Inc.
-Compiled Fri 15-Mar-19 17:28 by prod_rel_team 
+Copyright (c) 1986-2013 by Cisco Systems, Inc.
+Compiled Wed 26-Jun-13 02:49 by mnguyen
 
 advertisement version: 2
-VTP Management Domain: ''
-Native VLAN: 1
 Duplex: full
+```
+
 Вопрос:
+
 Какая версия IOS используется на  S1?
-Введите ваш ответ здесь.
+На S1 используется Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 15.0(2)SE4, RELEASE SOFTWARE (fc1)
  
 c.	На S1 используйте соответствующую команду show cdp, чтобы определить, сколько пакетов CDP было выданных.
 S1# show cdp traffic
