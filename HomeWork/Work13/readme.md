@@ -312,7 +312,7 @@ Enter configuration commands, one per line.  End with CNTL/Z.
 S2(config)#lldp run
 ```
 b.	На S1 выполните соответствующую команду lldp, чтобы предоставить подробную информацию о S2. 
-
+```
 S1# show lldp entry S2
 
 Capability codes:
@@ -347,29 +347,195 @@ Vlan ID: 1
 
 
 Total entries displayed: 1
-Вопрос:
-Что такое chassis ID  для коммутатора S2?
-Введите ваш ответ здесь.
- 
-Закройте окно настройки.
-c.	Соединитесь через консоль на всех устройствах и используйте команды LLDP, необходимые для отображения топологии физической сети только из выходных данных команды show.
- 
-#### Часть 4. Настройка NTP
-В части 4 необходимо настроить маршрутизатор R1 в качестве сервера NTP, а маршрутизатор R2 в качестве клиента NTP маршрутизатора R1. Необходимо выполнить синхронизацию времени для Syslog и отладочных функций. Если время не синхронизировано, сложно определить, какое сетевое событие стало причиной данного сообщения.
-#### Шаг 1. Выведите на экран текущее время.
-Откройте окно конфигурации
-Введите команду show clock для отображения текущего времени на R1. Запишите отображаемые сведения о текущем времени в следующей таблице.
-Дата	         Время	          Часовой пояс	Источник времени
-01.03.1993      1:4:59.432            UTC         Time source is hardware calendar
+```
+К сожалению, в CPT команда  show lldp entry S2 не работает.
+```
+S1#show lldp entry S2
+             ^
+% Invalid input detected at '^' marker.
+```
+Мы можем посмотреть соседние устройства командой:
+```
+S1#show lldp neighbors detail
+------------------------------------------------
+Chassis id: 0001.978B.E601
+Port id: Fa0/1
+Port Description: FastEthernet0/1
+System Name: S2
+System Description:
+Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 15.0(2)SE4, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2013 by Cisco Systems, Inc.
+Compiled Wed 26-Jun-13 02:49 by mnguyen
+Time remaining: 90 seconds
+System Capabilities: B
+Enabled Capabilities: B
+Management Addresses - not advertised
+Auto Negotiation - supported, enabled
+Physical media capabilities:
+    100baseT(FD)
+    100baseT(HD)
+    1000baseT(HD)
+Media Attachment Unit type: 10
+Vlan ID: 1
+------------------------------------------------
+Chassis id: 0030.A3E0.9702
+Port id: Gig0/0/1
+Port Description: GigabitEthernet0/0/1
+System Name: R1
+System Description:
+Cisco IOS XE Software, Version 03.13.04.S - Extended Support Release
+Cisco IOS Software, ISR Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.5(3)S5, RELEASE SOFTWARE (fc2)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2017 by Cisco Systems, Inc.
+Compiled Mon 05-Oct-15 11:24 by mcpre
+Time remaining: 90 seconds
+System Capabilities: R
+Enabled Capabilities: R
+Management Addresses - not advertised
+Auto Negotiation - supported, enabled
+Physical media capabilities:
+    1000baseT(HD)
+    100baseT(FD)
+Media Attachment Unit type: 10
+Vlan ID: 1
 
-R1#show clock detail
-*1:4:59.432 UTC Mon Mar 1 1993
+Total entries displayed: 2
+```
+
+#### Вопрос:
+
+Что такое chassis ID  для коммутатора S2?
+
+Chassis ID — это обязательный элемент в протоколе Link Layer Discovery Protocol (LLDP), который идентифицирует сетевой порт устройства, передающего LLDPDU (Data Unit).
+
+В данном случае - интерфейс Fa0/1 коммутатора S2.
+
+c.	Соединитесь через консоль на всех устройствах и используйте команды LLDP, необходимые для отображения топологии физической сети только из выходных данных команды show.
+
+Маршрутизатор R1
+```
+R1#show lldp neighbors detail
+------------------------------------------------
+Chassis id: 0005.5E15.0D05
+Port id: Fa0/5
+Port Description: FastEthernet0/5
+System Name: S1
+System Description:
+Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 15.0(2)SE4, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2013 by Cisco Systems, Inc.
+Compiled Wed 26-Jun-13 02:49 by mnguyen
+Time remaining: 90 seconds
+System Capabilities: B
+Enabled Capabilities: B
+Management Addresses - not advertised
+Auto Negotiation - supported, enabled
+Physical media capabilities:
+    100baseT(FD)
+    100baseT(HD)
+    1000baseT(HD)
+Media Attachment Unit type: 10
+Vlan ID: 1
+
+Total entries displayed: 1
+```
+Коммутатор S1
+```
+S1#show lldp neighbors detail
+------------------------------------------------
+Chassis id: 0001.978B.E601
+Port id: Fa0/1
+Port Description: FastEthernet0/1
+System Name: S2
+System Description:
+Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 15.0(2)SE4, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2013 by Cisco Systems, Inc.
+Compiled Wed 26-Jun-13 02:49 by mnguyen
+Time remaining: 90 seconds
+System Capabilities: B
+Enabled Capabilities: B
+Management Addresses - not advertised
+Auto Negotiation - supported, enabled
+Physical media capabilities:
+    100baseT(FD)
+    100baseT(HD)
+    1000baseT(HD)
+Media Attachment Unit type: 10
+Vlan ID: 1
+------------------------------------------------
+Chassis id: 0030.A3E0.9702
+Port id: Gig0/0/1
+Port Description: GigabitEthernet0/0/1
+System Name: R1
+System Description:
+Cisco IOS XE Software, Version 03.13.04.S - Extended Support Release
+Cisco IOS Software, ISR Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.5(3)S5, RELEASE SOFTWARE (fc2)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2017 by Cisco Systems, Inc.
+Compiled Mon 05-Oct-15 11:24 by mcpre
+Time remaining: 90 seconds
+System Capabilities: R
+Enabled Capabilities: R
+Management Addresses - not advertised
+Auto Negotiation - supported, enabled
+Physical media capabilities:
+    1000baseT(HD)
+    100baseT(FD)
+Media Attachment Unit type: 10
+Vlan ID: 1
+
+Total entries displayed: 2
+```
+Коммутатор S2
+```
+S2#show lldp neighbors detail
+------------------------------------------------
+Chassis id: 0005.5E15.0D01
+Port id: Fa0/1
+Port Description: FastEthernet0/1
+System Name: S1
+System Description:
+Cisco IOS Software, C2960 Software (C2960-LANBASEK9-M), Version 15.0(2)SE4, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2013 by Cisco Systems, Inc.
+Compiled Wed 26-Jun-13 02:49 by mnguyen
+Time remaining: 90 seconds
+System Capabilities: B
+Enabled Capabilities: B
+Management Addresses - not advertised
+Auto Negotiation - supported, enabled
+Physical media capabilities:
+    100baseT(FD)
+    100baseT(HD)
+    1000baseT(HD)
+Media Attachment Unit type: 10
+Vlan ID: 1
+
+Total entries displayed: 1
+```
+#### Часть 4. Настройка NTP
+В части 4 необходимо настроить маршрутизатор R1 в качестве сервера NTP, а маршрутизатор R2 в качестве клиента NTP маршрутизатора R1. 
+Необходимо выполнить синхронизацию времени для Syslog и отладочных функций. Если время не синхронизировано, сложно определить, какое сетевое событие стало причиной данного сообщения.
+#### Шаг 1. Выведите на экран текущее время.
+
+Введите команду show clock для отображения текущего времени на R1. 
+```
+R1#show clock detail 
+*0:48:48.540 UTC Mon Mar 1 1993
 Time source is hardware calendar
+```
+Запишите отображаемые сведения о текущем времени в следующей таблице.
+
+|Дата	         |Время	         | Часовой пояс|	Источник времени|
+|-------|-------|-------|-------|
+|01.03.1993    | 0:48:48.540   |        UTC   |      Time source is hardware calendar|
 
 #### Шаг 2. Установите время.
 С помощью команды clock set установите время на маршрутизаторе R1. Введенное время должно быть в формате UTC. 
 ```
-R1#clock set 16:04:00 14 april 2026
+R1#clock set 12:47:00 27 april 2026
 ``` 
 #### Шаг 3. Настройте главный сервер NTP.
 Настройте R1 в качестве хозяина NTP с уровнем слоя 4.
@@ -379,14 +545,19 @@ Enter configuration commands, one per line.  End with CNTL/Z.
 R1(config)#ntp master 4
 ``` 
 #### Шаг 4. Настройте клиент NTP.
-a.	Выполните соответствующую команду на S1 и S2, чтобы просмотреть настроенное время. Запишите текущее время,  в следующей таблице.
-Дата	Время	Часовой пояс
-
-
+a.	Выполните соответствующую команду на S1 и S2, чтобы просмотреть настроенное время. 
+```
 S1#show clock
-*1:12:11.832 UTC Mon Mar 1 1993
+*0:57:18.416 UTC Mon Mar 1 1993
 S2#show clock
-*1:12:57.448 UTC Mon Mar 1 1993
+*0:58:22.678 UTC Mon Mar 1 1993
+```
+Запишите текущее время,  в следующей таблице.
+
+|Дата|	Время	|Часовой пояс|
+|-------|-------|-------|
+|01.03.1993   |  0:57:18.416 |          UTC|  ----- Коммутатор S1
+|01.03.1993   |  0:58:22.678 |          UTC|  ----- Коммутатор S2
 
 b.	Настройте S1 и S2 в качестве клиентов NTP. Используйте соответствующие команды NTP для получения времени от интерфейса G0/0/1 R1, а также для периодического обновления календаря или аппаратных часов коммутатора.
 
