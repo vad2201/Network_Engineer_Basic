@@ -560,12 +560,56 @@ S2#show clock
 |01.03.1993   |  0:58:22.678 |          UTC|  ----- Коммутатор S2
 
 b.	Настройте S1 и S2 в качестве клиентов NTP. Используйте соответствующие команды NTP для получения времени от интерфейса G0/0/1 R1, а также для периодического обновления календаря или аппаратных часов коммутатора.
-  
 
-Шаг 5. Проверьте настройку NTP.
+Коммутатор S1 
+```
+S1(config)#ntp server 10.22.0.1
+S1(config)#up
+S1(config)#ntp update-calendar
+               ^
+% Invalid input detected at '^' marker.
+```  
+Коммутатор S2
+```
+S2(config)#ntp server 10.22.0.1
+S2(config)#ntp update-calendar
+               ^
+% Invalid input detected at '^' marker.
+```
+К сожалению, команда ntp update-calendar на CPT не работает.
+
+#### Шаг 5. Проверьте настройку NTP.
 a.	Используйте соответствующую команду show , чтобы убедиться, что S1 и S2 синхронизированы с R1.
+Коммутатор S1
+```
+S1#show ntp status 
+Clock is synchronized, stratum 5, reference is 10.22.0.1
+nominal freq is 250.0000 Hz, actual freq is 249.9990 Hz, precision is 2**24
+reference time is ED7106D4.0000017F (13:38:28.383 UTC Mon Apr 27 2026)
+clock offset is 0.00 msec, root delay is 0.00  msec
+root dispersion is 10.95 msec, peer dispersion is 0.12 msec.
+loopfilter state is 'CTRL' (Normal Controlled Loop), drift is - 0.000001193 s/s system poll interval is 4, last update was 10 sec ago.
+```
+Коммутатор S2
+```
+2#show ntp status
+Clock is synchronized, stratum 16, reference is 10.22.0.1
+nominal freq is 250.0000 Hz, actual freq is 249.9990 Hz, precision is 2**24
+reference time is 2BC3397A.000003A0 (2:56:58.928 UTC Tue Jun 24 2059)
+clock offset is 0.00 msec, root delay is 0.00  msec
+root dispersion is 10.11 msec, peer dispersion is 0.12 msec.
+loopfilter state is 'CTRL' (Normal Controlled Loop), drift is - 0.000001193 s/s system poll interval is 4, last update was 15 sec ago.
+```
+
 Примечание. Синхронизация метки времени на маршрутизаторе R2 с меткой времени на маршрутизаторе R1 может занять несколько минут.
 b.	Выполните соответствующую команду на S1 и S2, чтобы просмотреть настроенное время и сравнить ранее записанное время.
-Откройте окно конфигурации
-Вопрос для повторения
+```
+S2#show clock
+13:44:19.741 UTC Mon Apr 27 2026
+S2#show clock
+13:44:51.783 UTC Mon Apr 27 2026
+```
+
+#### Вопрос для повторения
 Для каких интерфейсов в пределах сети не следует использовать протоколы обнаружения сетевых ресурсов? Поясните ответ.
+Протоколы обнаружения сетевых ресурсов не рекомендуется использовать на интерфейсах, которые используются для подключения к внешним сетям. Это связано с тем, что такие протоколы могут раскрывать информацию о топологии сети и устройствах, что потенциально уязвимо для внешних атак. 
